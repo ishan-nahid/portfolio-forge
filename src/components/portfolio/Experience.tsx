@@ -1,9 +1,11 @@
-import { PORTFOLIO_DATA } from "@/data/portfolio";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
+import { usePortfolioContent } from "@/hooks/usePortfolioContent";
+import type { ExperienceItem } from "@/lib/portfolioContent";
 
 export function Experience() {
   const ref = useScrollReveal<HTMLElement>();
-  const { experience } = PORTFOLIO_DATA;
+  const { data } = usePortfolioContent();
+  const { experience } = data;
 
   return (
     <section id="experience" ref={ref} className="reveal py-24 px-4">
@@ -17,7 +19,7 @@ export function Experience() {
 
           <div className="flex flex-col gap-12">
             {experience.map((exp, i) => (
-              <TimelineEntry key={exp.company} entry={exp} index={i} />
+              <TimelineEntry key={`${exp.company}-${i}`} entry={exp} index={i} />
             ))}
           </div>
         </div>
@@ -26,13 +28,7 @@ export function Experience() {
   );
 }
 
-function TimelineEntry({
-  entry,
-  index,
-}: {
-  entry: (typeof PORTFOLIO_DATA)["experience"][number];
-  index: number;
-}) {
+function TimelineEntry({ entry, index }: { entry: ExperienceItem; index: number }) {
   const ref = useScrollReveal<HTMLDivElement>();
   const isLeft = index % 2 === 0;
 

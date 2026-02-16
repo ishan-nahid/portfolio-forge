@@ -1,9 +1,11 @@
-import { PORTFOLIO_DATA } from "@/data/portfolio";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
+import { usePortfolioContent } from "@/hooks/usePortfolioContent";
 
 export function TechStack() {
   const ref = useScrollReveal<HTMLElement>();
-  const { techStack } = PORTFOLIO_DATA;
+  const { data } = usePortfolioContent();
+  const { techStack } = data;
+
   const allTech = Object.entries(techStack);
 
   // Flat list for marquee
@@ -13,34 +15,36 @@ export function TechStack() {
   return (
     <section id="skills" ref={ref} className="reveal py-24 px-4">
       <div className="container mx-auto max-w-5xl">
-        <h2 className="mb-2 text-sm font-medium uppercase tracking-[0.3em] text-primary text-center">Tech Stack</h2>
-        <p className="mb-12 text-center text-3xl font-bold text-foreground sm:text-4xl">Tools I work with</p>
+        <h2 className="mb-2 text-sm font-medium uppercase tracking-[0.3em] text-primary text-center">Skills</h2>
+        <p className="mb-16 text-center text-3xl font-bold text-foreground sm:text-4xl">Tech I use</p>
 
-        {/* Marquee */}
-        <div className="relative mb-16 overflow-hidden py-4">
-          <div className="flex w-max gap-4 animate-marquee">
-            {doubled.map((t, i) => (
-              <span key={i} className="whitespace-nowrap rounded-full border border-border bg-secondary px-4 py-1.5 text-sm text-foreground">
-                {t}
-              </span>
-            ))}
-          </div>
-        </div>
-
-        {/* Categorized grid */}
-        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-8 lg:grid-cols-2">
           {allTech.map(([category, items]) => (
-            <div key={category}>
-              <h3 className="mb-3 text-xs font-semibold uppercase tracking-widest text-muted-foreground">{category}</h3>
+            <div key={category} className="rounded-lg border border-border bg-card p-6">
+              <h3 className="mb-4 text-lg font-bold text-foreground">{category}</h3>
               <div className="flex flex-wrap gap-2">
-                {items.map((item) => (
-                  <span key={item} className="rounded-md border border-border bg-card px-3 py-1 text-sm text-foreground">
-                    {item}
+                {items.map((t) => (
+                  <span
+                    key={t}
+                    className="rounded-md border border-border bg-secondary px-2.5 py-1 text-xs text-foreground"
+                  >
+                    {t}
                   </span>
                 ))}
               </div>
             </div>
           ))}
+        </div>
+
+        {/* Marquee */}
+        <div className="mt-16 overflow-hidden rounded-lg border border-border bg-card">
+          <div className="flex gap-6 py-4 animate-[marquee_25s_linear_infinite] will-change-transform">
+            {doubled.map((t, i) => (
+              <span key={`${t}-${i}`} className="text-sm text-muted-foreground whitespace-nowrap">
+                {t}
+              </span>
+            ))}
+          </div>
         </div>
       </div>
     </section>

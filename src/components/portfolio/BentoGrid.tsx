@@ -1,10 +1,11 @@
-import { PORTFOLIO_DATA } from "@/data/portfolio";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import { GraduationCap, Heart, Award, Users } from "lucide-react";
+import { usePortfolioContent } from "@/hooks/usePortfolioContent";
 
 export function BentoGrid() {
   const ref = useScrollReveal<HTMLElement>();
-  const { education, volunteering, awards, hobbies } = PORTFOLIO_DATA;
+  const { data } = usePortfolioContent();
+  const { education, volunteering, awards, hobbies } = data;
 
   return (
     <section id="about" ref={ref} className="reveal py-24 px-4">
@@ -25,7 +26,9 @@ export function BentoGrid() {
               <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-2">Key Coursework</p>
               <div className="flex flex-wrap gap-2">
                 {education.coursework.map((c) => (
-                  <span key={c} className="rounded-md border border-border bg-secondary px-2.5 py-1 text-xs text-foreground">{c}</span>
+                  <span key={c} className="rounded-md border border-border bg-secondary px-2.5 py-1 text-xs text-foreground">
+                    {c}
+                  </span>
                 ))}
               </div>
             </div>
@@ -37,7 +40,9 @@ export function BentoGrid() {
             <h3 className="text-lg font-bold text-foreground mb-3">Volunteering</h3>
             <ul className="space-y-3 flex-1">
               {volunteering.map((v, i) => (
-                <li key={i} className="text-sm text-muted-foreground leading-relaxed">{v}</li>
+                <li key={i} className="text-sm text-muted-foreground leading-relaxed">
+                  {v}
+                </li>
               ))}
             </ul>
           </div>
