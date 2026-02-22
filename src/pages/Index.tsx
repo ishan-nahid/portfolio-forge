@@ -37,6 +37,41 @@ type ExperienceData = {
   description: string;
 };
 
+const fallbackProfile: ProfileData = {
+  full_name: "John Doe",
+  role: "Software Engineer",
+  bio: "Building awesome things.",
+  github_url: "#",
+  linkedin_url: "#",
+};
+
+const fallbackProjects: ProjectData[] = [
+  {
+    title: "Portfolio Platform",
+    description: "A full-stack portfolio with CMS controls and dynamic content rendering.",
+    github_url: "#",
+    live_url: "#",
+    image_url: "",
+  },
+];
+
+const fallbackSkills: SkillData[] = [
+  { name: "TypeScript", category: "Frontend" },
+  { name: "React", category: "Frontend" },
+  { name: "Supabase", category: "Backend" },
+  { name: "Cloudflare", category: "Platform" },
+];
+
+const fallbackExperience: ExperienceData[] = [
+  {
+    company: "Example Company",
+    role: "Software Engineer",
+    start_date: "2022",
+    end_date: "Present",
+    description: "Delivered production-ready features across frontend and backend systems.",
+  },
+];
+
 const Index = () => {
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [projects, setProjects] = useState<ProjectData[]>([]);
@@ -61,17 +96,22 @@ const Index = () => {
     fetchPortfolioData();
   }, []);
 
+  const displayProfile = profile ?? fallbackProfile;
+  const displayProjects = projects.length > 0 ? projects : fallbackProjects;
+  const displaySkills = skills.length > 0 ? skills : fallbackSkills;
+  const displayExperience = experience.length > 0 ? experience : fallbackExperience;
+
   return (
     <>
       <Navbar />
       <main>
-        <Hero profile={profile} />
-        <TechStack skills={skills} />
-        <Projects projects={projects} />
-        <Experience experience={experience} />
+        <Hero profile={displayProfile} />
+        <TechStack skills={displaySkills} />
+        <Projects projects={displayProjects} />
+        <Experience experience={displayExperience} />
         <BentoGrid />
       </main>
-      <Footer profile={profile} />
+      <Footer profile={displayProfile} />
     </>
   );
 };
