@@ -28,11 +28,17 @@ export function Contact() {
     event.preventDefault();
 
     const accessKey = import.meta.env.VITE_WEB3FORMS_KEY;
+    const formData = {
+      name: formState.name,
+      email: formState.email,
+      message: formState.message,
+      subject: `Portfolio inquiry from ${formState.name}`,
+    };
 
     if (!accessKey) {
       toast({
-        title: "Missing configuration",
-        description: "Web3Forms access key is not set. Please add VITE_WEB3FORMS_KEY to your environment.",
+        title: "Failed to send",
+        description: "Key missing",
         variant: "destructive",
       });
       return;
@@ -41,22 +47,26 @@ export function Contact() {
     setIsSending(true);
 
     try {
-      const formData = new FormData();
-      formData.append("access_key", accessKey);
-      formData.append("name", formState.name);
-      formData.append("email", formState.email);
-      formData.append("message", formState.message);
-      formData.append("subject", `Portfolio inquiry from ${formState.name}`);
-
       const response = await fetch("https://api.web3forms.com/submit", {
         method: "POST",
-        body: formData,
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          access_key: import.meta.env.VITE_WEB3FORMS_KEY,
+          ...formData,
+        }),
       });
 
-      const result = await response.json();
+      const result = await response.json().catch(() => null);
 
-      if (!response.ok || !result.success) {
-        throw new Error(result.message || "Failed to send message");
+      if (!response.ok) {
+        throw new Error(`Error ${response.status}`);
+      }
+
+      if (!result?.success) {
+        throw new Error(result?.message || "Error unknown");
       }
 
       setFormState(initialFormState);
