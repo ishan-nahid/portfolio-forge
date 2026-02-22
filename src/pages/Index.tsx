@@ -14,6 +14,9 @@ type ProfileData = {
   bio: string;
   github_url: string;
   linkedin_url: string;
+  resume_url?: string;
+  email?: string;
+  avatar_url?: string;
 };
 
 type ProjectData = {
@@ -37,12 +40,36 @@ type ExperienceData = {
   description: string;
 };
 
+type AboutData = {
+  education: {
+    degree: string;
+    university: string;
+    gpa: string;
+    coursework: string[];
+  };
+  volunteering: string[];
+  awards: string[];
+  hobbies: string[];
+};
+
+const navLinks = [
+  { label: "Home", href: "#home" },
+  { label: "Work", href: "#work" },
+  { label: "Skills", href: "#skills" },
+  { label: "Experience", href: "#experience" },
+  { label: "About", href: "#about" },
+  { label: "Contact", href: "#contact" },
+];
+
 const fallbackProfile: ProfileData = {
   full_name: "John Doe",
   role: "Software Engineer",
   bio: "Building awesome things.",
   github_url: "#",
   linkedin_url: "#",
+  resume_url: "#",
+  email: "",
+  avatar_url: "",
 };
 
 const fallbackProjects: ProjectData[] = [
@@ -72,6 +99,27 @@ const fallbackExperience: ExperienceData[] = [
   },
 ];
 
+const fallbackAbout: AboutData = {
+  education: {
+    degree: "B.S. Computer Science",
+    university: "University of California, Berkeley",
+    gpa: "3.87 / 4.0",
+    coursework: ["Distributed Systems", "Machine Learning", "Computer Networks", "Database Systems", "Algorithms"],
+  },
+  volunteering: [
+    "Mentor at Code.org — Teaching web development to underrepresented high school students.",
+    "Hackathon Organizer — CalHacks, 1500+ participants across 3 editions.",
+    "Open Source — Active contributor to React and Node.js ecosystems.",
+  ],
+  awards: [
+    "Dean's Honor List — 6 semesters",
+    "Google Summer of Code 2019 — Chromium project",
+    "1st Place — HackMIT 2020",
+    "AWS Certified Solutions Architect",
+  ],
+  hobbies: ["Rock climbing", "Mechanical keyboards", "Film photography", "Chess"],
+};
+
 const Index = () => {
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [projects, setProjects] = useState<ProjectData[]>([]);
@@ -81,7 +129,7 @@ const Index = () => {
   useEffect(() => {
     async function fetchPortfolioData() {
       const [profileResponse, projectsResponse, skillsResponse, experienceResponse] = await Promise.all([
-        supabase.from("profile").select("full_name, role, bio, github_url, linkedin_url").limit(1).maybeSingle(),
+        supabase.from("profile").select("full_name, role, bio, github_url, linkedin_url, resume_url, email, avatar_url").limit(1).maybeSingle(),
         supabase.from("projects").select("title, description, github_url, live_url, image_url"),
         supabase.from("skills").select("name, category").order("category"),
         supabase.from("experience").select("company, role, start_date, end_date, description").order("start_date", { ascending: false }),
@@ -103,13 +151,13 @@ const Index = () => {
 
   return (
     <>
-      <Navbar />
+      <Navbar profile={displayProfile} navLinks={navLinks} />
       <main>
         <Hero profile={displayProfile} />
         <TechStack skills={displaySkills} />
         <Projects projects={displayProjects} />
         <Experience experience={displayExperience} />
-        <BentoGrid />
+        <BentoGrid about={fallbackAbout} />
       </main>
       <Footer profile={displayProfile} />
     </>

@@ -1,20 +1,32 @@
 import { useState } from "react";
 import { Github, Linkedin, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
-import { useProfile } from "@/hooks/useSupabaseData";
-import { usePortfolioContent } from "@/hooks/usePortfolioContent";
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
-export function Navbar() {
+type ProfileData = {
+  full_name: string;
+  github_url: string;
+  linkedin_url: string;
+  resume_url?: string;
+};
+
+type NavLink = {
+  label: string;
+  href: string;
+};
+
+type NavbarProps = {
+  profile: ProfileData | null;
+  navLinks: NavLink[];
+};
+
+export function Navbar({ profile, navLinks }: NavbarProps) {
   const [open, setOpen] = useState(false);
-  const { data: profile } = useProfile();
-  const { data: fallback } = usePortfolioContent();
 
-  const name = profile?.full_name || fallback.name;
-  const resumeUrl = profile?.resume_url || fallback.resumeUrl;
-  const github = profile?.github_url || fallback.socials.github;
-  const linkedin = profile?.linkedin_url || fallback.socials.linkedin;
-  const { navLinks } = fallback;
+  const name = profile?.full_name || "Portfolio";
+  const resumeUrl = profile?.resume_url || "#";
+  const github = profile?.github_url || "#";
+  const linkedin = profile?.linkedin_url || "#";
   const firstName = (name || "Portfolio").split(" ")[0];
 
   const hasResume = Boolean(resumeUrl && resumeUrl !== "#");

@@ -1,11 +1,25 @@
 import { useScrollReveal } from "@/hooks/useScrollReveal";
-import { GraduationCap, Heart, Award, Users } from "lucide-react";
-import { usePortfolioContent } from "@/hooks/usePortfolioContent";
+import { Award, GraduationCap, Heart, Users } from "lucide-react";
 
-export function BentoGrid() {
+type AboutData = {
+  education: {
+    degree: string;
+    university: string;
+    gpa: string;
+    coursework: string[];
+  };
+  volunteering: string[];
+  awards: string[];
+  hobbies: string[];
+};
+
+type BentoGridProps = {
+  about: AboutData;
+};
+
+export function BentoGrid({ about }: BentoGridProps) {
   const ref = useScrollReveal<HTMLElement>();
-  const { data } = usePortfolioContent();
-  const { education, volunteering, awards, hobbies } = data;
+  const { education, volunteering, awards, hobbies } = about;
 
   return (
     <section id="about" ref={ref} className="reveal py-24 px-4">
@@ -14,7 +28,6 @@ export function BentoGrid() {
         <p className="mb-16 text-center text-3xl font-bold text-foreground sm:text-4xl">Beyond the code</p>
 
         <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 auto-rows-[minmax(140px,auto)]">
-          {/* Education — large (2x2) */}
           <div className="rounded-lg border border-border bg-card p-6 sm:col-span-2 sm:row-span-2 flex flex-col justify-between">
             <div>
               <GraduationCap className="h-6 w-6 text-primary mb-4" />
@@ -34,7 +47,6 @@ export function BentoGrid() {
             </div>
           </div>
 
-          {/* Volunteering — tall */}
           <div className="rounded-lg border border-border bg-card p-6 sm:row-span-2 flex flex-col">
             <Users className="h-6 w-6 text-primary mb-4" />
             <h3 className="text-lg font-bold text-foreground mb-3">Volunteering</h3>
@@ -47,7 +59,6 @@ export function BentoGrid() {
             </ul>
           </div>
 
-          {/* Hobbies — small */}
           <div className="rounded-lg border border-border bg-card p-6 flex flex-col">
             <Heart className="h-5 w-5 text-primary mb-3" />
             <h3 className="text-base font-bold text-foreground mb-2">Life</h3>
@@ -58,7 +69,6 @@ export function BentoGrid() {
             </div>
           </div>
 
-          {/* Awards — wide (2 cols) */}
           <div className="rounded-lg border border-border bg-card p-6 sm:col-span-2">
             <Award className="h-6 w-6 text-primary mb-4" />
             <h3 className="text-lg font-bold text-foreground mb-3">Awards & Certifications</h3>
