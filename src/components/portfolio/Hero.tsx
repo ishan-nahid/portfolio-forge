@@ -1,17 +1,23 @@
 import { Button } from "@/components/ui/button";
 import { ArrowDown, Mail } from "lucide-react";
-import { useProfile } from "@/hooks/useSupabaseData";
-import { usePortfolioContent } from "@/hooks/usePortfolioContent";
 
-export function Hero() {
-  const { data: profile, loading } = useProfile();
-  const { data: fallback } = usePortfolioContent();
+type ProfileData = {
+  full_name: string;
+  role: string;
+  bio: string;
+  github_url: string;
+  linkedin_url: string;
+};
 
-  const name = profile?.full_name || fallback.name;
-  const title = profile?.role || fallback.title;
-  const bio = profile?.bio || fallback.subheadline;
-  const avatarUrl = profile?.avatar_url || fallback.avatarUrl;
-  const email = profile?.email || fallback.email;
+type HeroProps = {
+  profile: ProfileData | null;
+};
+
+export function Hero({ profile }: HeroProps) {
+  const name = profile?.full_name || "";
+  const title = profile?.role || "";
+  const bio = profile?.bio || "";
+  const avatarUrl = "";
 
   const initials = name
     ?.split(" ")
@@ -37,7 +43,7 @@ export function Hero() {
           {title}
         </p>
         <h1 className="mb-6 text-4xl font-bold leading-tight tracking-tight text-foreground sm:text-5xl lg:text-7xl animate-[fade-in_0.6s_ease-out_0.4s_both]">
-          {fallback.headline}
+          {name}
         </h1>
         <p className="mx-auto mb-10 max-w-2xl text-lg text-muted-foreground sm:text-xl animate-[fade-in_0.6s_ease-out_0.6s_both]">
           {bio}

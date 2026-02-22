@@ -1,22 +1,33 @@
 import { useScrollReveal } from "@/hooks/useScrollReveal";
-import { useExperience } from "@/hooks/useSupabaseData";
-import { usePortfolioContent } from "@/hooks/usePortfolioContent";
-import type { ExperienceItem } from "@/lib/portfolioContent";
 
-export function Experience() {
+type ExperienceData = {
+  company: string;
+  role: string;
+  start_date: string;
+  end_date: string;
+  description: string;
+};
+
+type ExperienceItem = {
+  role: string;
+  company: string;
+  period: string;
+  bullets: string[];
+};
+
+type ExperienceProps = {
+  experience: ExperienceData[];
+};
+
+export function Experience({ experience: dbExperience }: ExperienceProps) {
   const ref = useScrollReveal<HTMLElement>();
-  const { data: dbExperience, loading } = useExperience();
-  const { data: fallback } = usePortfolioContent();
 
-  // Use Supabase data if available, else fallback
-  const experience: ExperienceItem[] = dbExperience.length > 0
-    ? dbExperience.map((e) => ({
-        role: e.role,
-        company: e.company,
-        period: `${e.start_date} — ${e.end_date}`,
-        bullets: e.description ? e.description.split("\n").filter(Boolean) : [],
-      }))
-    : fallback.experience;
+  const experience: ExperienceItem[] = dbExperience.map((e) => ({
+    role: e.role,
+    company: e.company,
+    period: `${e.start_date} — ${e.end_date}`,
+    bullets: e.description ? e.description.split("\n").filter(Boolean) : [],
+  }));
 
   return (
     <section id="experience" ref={ref} className="reveal py-24 px-4">

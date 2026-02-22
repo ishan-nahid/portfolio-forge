@@ -1,12 +1,8 @@
-import { useEffect, useState } from "react";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
 import { ExternalLink, Github } from "lucide-react";
-import { supabase } from "@/lib/supabaseClient";
 
-type SupabaseProject = {
+type ProjectData = {
   title: string;
   description: string;
   github_url: string;
@@ -14,27 +10,12 @@ type SupabaseProject = {
   image_url: string;
 };
 
-export function Projects() {
+type ProjectsProps = {
+  projects: ProjectData[];
+};
+
+export function Projects({ projects }: ProjectsProps) {
   const ref = useScrollReveal<HTMLElement>();
-  const [projects, setProjects] = useState<SupabaseProject[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    async function fetchProjects() {
-      const { data, error } = await supabase
-        .from("projects")
-        .select("title, description, github_url, live_url, image_url");
-
-      if (error) {
-        setError(error.message);
-      } else {
-        setProjects(data ?? []);
-      }
-      setLoading(false);
-    }
-    fetchProjects();
-  }, []);
 
   return (
     <section id="work" ref={ref} className="reveal py-24 px-4">
@@ -42,26 +23,7 @@ export function Projects() {
         <h2 className="mb-2 text-sm font-medium uppercase tracking-[0.3em] text-primary text-center">Featured Work</h2>
         <p className="mb-16 text-center text-3xl font-bold text-foreground sm:text-4xl">Projects I've built</p>
 
-        {loading ? (
-          <div className="flex flex-col gap-20">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="flex flex-col gap-8 lg:flex-row lg:items-center">
-                <Skeleton className="flex-1 aspect-video rounded-lg" />
-                <div className="flex-1 space-y-4">
-                  <Skeleton className="h-8 w-3/4" />
-                  <Skeleton className="h-20 w-full" />
-                  <div className="flex gap-2">
-                    <Skeleton className="h-6 w-16" />
-                    <Skeleton className="h-6 w-16" />
-                    <Skeleton className="h-6 w-16" />
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : error ? (
-          <p className="text-center text-destructive">{error}</p>
-        ) : projects.length === 0 ? (
+        {projects.length === 0 ? (
           <p className="text-center text-muted-foreground">No projects found.</p>
         ) : (
           <div className="flex flex-col gap-20">
@@ -75,7 +37,7 @@ export function Projects() {
   );
 }
 
-function ProjectCard({ project, reversed }: { project: SupabaseProject; reversed: boolean }) {
+function ProjectCard({ project, reversed }: { project: ProjectData; reversed: boolean }) {
   const ref = useScrollReveal<HTMLElement>();
 
   const hasDemo = Boolean(project.live_url && project.live_url !== "#");

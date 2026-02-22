@@ -1,15 +1,22 @@
 import { Github, Linkedin, Mail } from "lucide-react";
-import { useProfile } from "@/hooks/useSupabaseData";
-import { usePortfolioContent } from "@/hooks/usePortfolioContent";
 
-export function Footer() {
-  const { data: profile } = useProfile();
-  const { data: fallback } = usePortfolioContent();
+type ProfileData = {
+  full_name: string;
+  role: string;
+  bio: string;
+  github_url: string;
+  linkedin_url: string;
+};
 
-  const name = profile?.full_name || fallback.name;
-  const email = profile?.email || fallback.email;
-  const github = profile?.github_url || fallback.socials.github;
-  const linkedin = profile?.linkedin_url || fallback.socials.linkedin;
+type FooterProps = {
+  profile: ProfileData | null;
+};
+
+export function Footer({ profile }: FooterProps) {
+  const name = profile?.full_name || "";
+  const email = "";
+  const github = profile?.github_url || "";
+  const linkedin = profile?.linkedin_url || "";
 
   const hasGithub = Boolean(github && github !== "#");
   const hasLinkedin = Boolean(linkedin && linkedin !== "#");
