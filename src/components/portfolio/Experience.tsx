@@ -1,11 +1,22 @@
 import { useScrollReveal } from "@/hooks/useScrollReveal";
+import { useExperience } from "@/hooks/useSupabaseData";
 import { usePortfolioContent } from "@/hooks/usePortfolioContent";
 import type { ExperienceItem } from "@/lib/portfolioContent";
 
 export function Experience() {
   const ref = useScrollReveal<HTMLElement>();
-  const { data } = usePortfolioContent();
-  const { experience } = data;
+  const { data: dbExperience, loading } = useExperience();
+  const { data: fallback } = usePortfolioContent();
+
+  // Use Supabase data if available, else fallback
+  const experience: ExperienceItem[] = dbExperience.length > 0
+    ? dbExperience.map((e) => ({
+        role: e.role,
+        company: e.company,
+        period: `${e.start_date} — ${e.end_date}`,
+        bullets: e.description ? e.description.split("\n").filter(Boolean) : [],
+      }))
+    : fallback.experience;
 
   return (
     <section id="experience" ref={ref} className="reveal py-24 px-4">
@@ -14,7 +25,6 @@ export function Experience() {
         <p className="mb-16 text-center text-3xl font-bold text-foreground sm:text-4xl">Where I've worked</p>
 
         <div className="relative">
-          {/* Timeline line */}
           <div className="absolute left-4 top-0 bottom-0 w-px bg-border lg:left-1/2 lg:-translate-x-px" />
 
           <div className="flex flex-col gap-12">
@@ -34,7 +44,6 @@ function TimelineEntry({ entry, index }: { entry: ExperienceItem; index: number 
 
   return (
     <div ref={ref} className={`reveal relative pl-12 lg:pl-0 lg:w-1/2 ${isLeft ? "lg:pr-12 lg:self-start" : "lg:pl-12 lg:self-end"}`}>
-      {/* Dot */}
       <div className={`absolute top-1 left-3 h-3 w-3 rounded-full bg-primary border-2 border-background lg:left-auto ${isLeft ? "lg:-right-1.5" : "lg:-left-1.5"}`} />
 
       <div className="rounded-lg border border-border bg-card p-6">
