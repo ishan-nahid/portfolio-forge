@@ -1,23 +1,23 @@
 import { useScrollReveal } from "@/hooks/useScrollReveal";
-import { useSkills } from "@/hooks/useSupabaseData";
-import { usePortfolioContent } from "@/hooks/usePortfolioContent";
 
-export function TechStack() {
+type SkillData = {
+  name: string;
+  category: string;
+};
+
+type TechStackProps = {
+  skills: SkillData[];
+};
+
+export function TechStack({ skills }: TechStackProps) {
   const ref = useScrollReveal<HTMLElement>();
-  const { data: skills, loading } = useSkills();
-  const { data: fallback } = usePortfolioContent();
 
-  // Group skills by category — use Supabase data if available, else fallback
-  const hasDbSkills = skills.length > 0;
-
-  const grouped: Record<string, string[]> = hasDbSkills
-    ? skills.reduce((acc, s) => {
-        const cat = s.category || "General";
-        if (!acc[cat]) acc[cat] = [];
-        acc[cat].push(s.name);
-        return acc;
-      }, {} as Record<string, string[]>)
-    : fallback.techStack;
+  const grouped: Record<string, string[]> = skills.reduce((acc, s) => {
+    const cat = s.category || "General";
+    if (!acc[cat]) acc[cat] = [];
+    acc[cat].push(s.name);
+    return acc;
+  }, {} as Record<string, string[]>);
 
   const allTech = Object.entries(grouped);
   const flat = Object.values(grouped).flat();
