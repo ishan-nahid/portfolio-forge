@@ -23,7 +23,7 @@ export function Footer({ profile }: FooterProps) {
   const hasLinkedin = Boolean(linkedin && linkedin !== "#");
 
   return (
-    <footer id="contact" className="border-t border-border py-16 px-4">
+    <footer className="border-t border-border py-16 px-4">
       <div className="container mx-auto max-w-4xl text-center">
         <h2 className="mb-4 text-3xl font-bold text-foreground sm:text-4xl">Let's connect</h2>
         <p className="mb-8 text-muted-foreground">Have a project in mind or just want to chat? Drop me a line.</p>
