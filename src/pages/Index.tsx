@@ -4,6 +4,7 @@ import { TechStack } from "@/components/portfolio/TechStack";
 import { Projects } from "@/components/portfolio/Projects";
 import { Experience } from "@/components/portfolio/Experience";
 import { BentoGrid } from "@/components/portfolio/BentoGrid";
+import { Contact } from "@/components/portfolio/Contact";
 import { Footer } from "@/components/portfolio/Footer";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -158,6 +159,7 @@ const Index = () => {
         <Projects projects={displayProjects} />
         <Experience experience={displayExperience} />
         <BentoGrid about={fallbackAbout} />
+        <Contact />
       </main>
       <Footer profile={displayProfile} />
     </>
