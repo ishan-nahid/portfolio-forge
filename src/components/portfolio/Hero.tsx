@@ -7,6 +7,7 @@ type ProfileData = {
   bio: string;
   github_url: string;
   linkedin_url: string;
+  avatar_url?: string;
 };
 
 type HeroProps = {
@@ -17,7 +18,7 @@ export function Hero({ profile }: HeroProps) {
   const name = profile?.full_name || "";
   const title = profile?.role || "";
   const bio = profile?.bio || "";
-  const avatarUrl = "";
+  const avatarUrl = profile?.avatar_url;
 
   const initials = name
     ?.split(" ")
