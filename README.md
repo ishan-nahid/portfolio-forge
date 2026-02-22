@@ -1,73 +1,33 @@
-# Welcome to your Lovable project
+# Portfolio Forge
 
-## Project info
+## Repository Context
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+Portfolio Forge is a React + TypeScript portfolio application with two data paths currently present in the codebase:
 
-## How can I edit this code?
+- **Public portfolio content path (Cloudflare):** portfolio sections (hero, stack, experience, footer, etc.) load via `/api/content`, backed by Cloudflare KV and merged with default fallback content.
+- **Projects + admin CRUD path (Supabase):** the `/admin` page and project list currently perform direct Supabase CRUD queries.
+- **Asset upload path (Cloudflare):** `/api/admin/upload` stores uploaded files in Cloudflare R2 and returns a public URL.
 
-There are several ways of editing your application.
+Core stack:
 
-**Use Lovable**
+- React 18 + Vite + TypeScript
+- React Router + TanStack Query
+- Tailwind CSS + shadcn/ui
+- Cloudflare Pages Functions (KV + R2 + Access-protected admin APIs)
+- Supabase (database CRUD in current admin/project flows)
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+## Architecture Diagram
 
-Changes made via Lovable will be committed automatically to this repo.
+```mermaid
+flowchart TD
+    U[Visitor / Admin Browser] --> FE[React SPA\n(Vite + Router + Query)]
 
-**Use your preferred IDE**
+    FE -->|GET /api/content| CFPublic[Cloudflare Function\nfunctions/api/content.ts]
+    CFPublic --> KV[(Cloudflare KV\nCONTENT_KV)]
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+    FE -->|GET/PUT /api/admin/content\nPOST /api/admin/upload| CFAdmin[Cloudflare Admin Functions\nAccess-protected]
+    CFAdmin --> KV
+    CFAdmin --> R2[(Cloudflare R2\nASSETS_BUCKET)]
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+    FE -->|Direct CRUD (projects/skills/experience/profile)| SB[(Supabase)]
 ```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
