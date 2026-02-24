@@ -3,6 +3,8 @@ import { Hero } from "@/components/portfolio/Hero";
 import { TechStack } from "@/components/portfolio/TechStack";
 import { Projects } from "@/components/portfolio/Projects";
 import { Experience } from "@/components/portfolio/Experience";
+import { Education, type EducationData } from "@/components/portfolio/Education";
+import { Certifications, type CertificationData } from "@/components/portfolio/Certifications";
 import { BentoGrid } from "@/components/portfolio/BentoGrid";
 import { Contact } from "@/components/portfolio/Contact";
 import { Footer } from "@/components/portfolio/Footer";
@@ -58,6 +60,8 @@ const navLinks = [
   { label: "Work", href: "#work" },
   { label: "Skills", href: "#skills" },
   { label: "Experience", href: "#experience" },
+  { label: "Education", href: "#education" },
+  { label: "Certifications", href: "#certifications" },
   { label: "About", href: "#about" },
   { label: "Contact", href: "#contact" },
 ];
@@ -100,6 +104,25 @@ const fallbackExperience: ExperienceData[] = [
   },
 ];
 
+const fallbackEducation: EducationData[] = [
+  {
+    degree: "B.S. in Computer Science",
+    institution: "University of California, Berkeley",
+    start_date: "2018",
+    end_date: "2022",
+    description: "Focused on distributed systems, machine learning, and software engineering.",
+  },
+];
+
+const fallbackCertifications: CertificationData[] = [
+  {
+    title: "AWS Certified Solutions Architect",
+    issuer: "Amazon Web Services",
+    date_earned: "2024",
+    url: "#",
+  },
+];
+
 const fallbackAbout: AboutData = {
   education: {
     degree: "B.S. Computer Science",
@@ -126,20 +149,26 @@ const Index = () => {
   const [projects, setProjects] = useState<ProjectData[]>([]);
   const [skills, setSkills] = useState<SkillData[]>([]);
   const [experience, setExperience] = useState<ExperienceData[]>([]);
+  const [education, setEducation] = useState<EducationData[]>([]);
+  const [certifications, setCertifications] = useState<CertificationData[]>([]);
 
   useEffect(() => {
     async function fetchPortfolioData() {
-      const [profileResponse, projectsResponse, skillsResponse, experienceResponse] = await Promise.all([
+      const [profileResponse, projectsResponse, skillsResponse, experienceResponse, educationResponse, certificationsResponse] = await Promise.all([
         supabase.from("profile").select("full_name, role, bio, github_url, linkedin_url, resume_url, email, avatar_url").limit(1).maybeSingle(),
         supabase.from("projects").select("title, description, github_url, live_url, image_url"),
         supabase.from("skills").select("name, category").order("category"),
         supabase.from("experience").select("company, role, start_date, end_date, description").order("start_date", { ascending: false }),
+        supabase.from("education").select("id, degree, institution, start_date, end_date, description").order("start_date", { ascending: false }),
+        supabase.from("certifications").select("id, title, issuer, date_earned, url").order("date_earned", { ascending: false }),
       ]);
 
       setProfile(profileResponse.data ?? null);
       setProjects(projectsResponse.data ?? []);
       setSkills(skillsResponse.data ?? []);
       setExperience(experienceResponse.data ?? []);
+      setEducation(educationResponse.data ?? []);
+      setCertifications(certificationsResponse.data ?? []);
     }
 
     fetchPortfolioData();
@@ -149,6 +178,8 @@ const Index = () => {
   const displayProjects = projects.length > 0 ? projects : fallbackProjects;
   const displaySkills = skills.length > 0 ? skills : fallbackSkills;
   const displayExperience = experience.length > 0 ? experience : fallbackExperience;
+  const displayEducation = education.length > 0 ? education : fallbackEducation;
+  const displayCertifications = certifications.length > 0 ? certifications : fallbackCertifications;
 
   return (
     <>
@@ -158,6 +189,8 @@ const Index = () => {
         <TechStack skills={displaySkills} />
         <Projects projects={displayProjects} />
         <Experience experience={displayExperience} />
+        <Education education={displayEducation} />
+        <Certifications certifications={displayCertifications} />
         <BentoGrid about={fallbackAbout} />
         <Contact />
       </main>
