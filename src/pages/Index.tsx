@@ -1,10 +1,11 @@
 import { Navbar } from "@/components/portfolio/Navbar";
 import { Hero } from "@/components/portfolio/Hero";
-import { TechStack } from "@/components/portfolio/TechStack";
+import { Skills, type SkillData } from "@/components/portfolio/Skills";
 import { Projects } from "@/components/portfolio/Projects";
 import { Experience } from "@/components/portfolio/Experience";
 import { Education, type EducationData } from "@/components/portfolio/Education";
 import { Certifications, type CertificationData } from "@/components/portfolio/Certifications";
+import { Honors, type HonorData } from "@/components/portfolio/Honors";
 import { BentoGrid } from "@/components/portfolio/BentoGrid";
 import { Contact } from "@/components/portfolio/Contact";
 import { Footer } from "@/components/portfolio/Footer";
@@ -28,11 +29,6 @@ type ProjectData = {
   github_url: string;
   live_url: string;
   image_url: string;
-};
-
-type SkillData = {
-  name: string;
-  category: string;
 };
 
 type ExperienceData = {
@@ -62,6 +58,7 @@ const navLinks = [
   { label: "Experience", href: "#experience" },
   { label: "Education", href: "#education" },
   { label: "Certifications", href: "#certifications" },
+  { label: "Honors", href: "#honors" },
   { label: "About", href: "#about" },
   { label: "Contact", href: "#contact" },
 ];
@@ -123,6 +120,15 @@ const fallbackCertifications: CertificationData[] = [
   },
 ];
 
+const fallbackHonors: HonorData[] = [
+  {
+    award: "Dean's Honor List",
+    issuer: "University of California, Berkeley",
+    description: "Recognized for academic excellence across six semesters.",
+    awarded_on: "2022",
+  },
+];
+
 const fallbackAbout: AboutData = {
   education: {
     degree: "B.S. Computer Science",
@@ -151,16 +157,18 @@ const Index = () => {
   const [experience, setExperience] = useState<ExperienceData[]>([]);
   const [education, setEducation] = useState<EducationData[]>([]);
   const [certifications, setCertifications] = useState<CertificationData[]>([]);
+  const [honors, setHonors] = useState<HonorData[]>([]);
 
   useEffect(() => {
     async function fetchPortfolioData() {
-      const [profileResponse, projectsResponse, skillsResponse, experienceResponse, educationResponse, certificationsResponse] = await Promise.all([
+      const [profileResponse, projectsResponse, skillsResponse, experienceResponse, educationResponse, certificationsResponse, honorsResponse] = await Promise.all([
         supabase.from("profile").select("full_name, role, bio, github_url, linkedin_url, resume_url, email, avatar_url").limit(1).maybeSingle(),
         supabase.from("projects").select("title, description, github_url, live_url, image_url"),
-        supabase.from("skills").select("name, category").order("category"),
+        supabase.from("skills").select("id, name, category").order("category"),
         supabase.from("experience").select("company, role, start_date, end_date, description").order("start_date", { ascending: false }),
         supabase.from("education").select("id, degree, institution, start_date, end_date, description").order("start_date", { ascending: false }),
         supabase.from("certifications").select("id, title, issuer, date_earned, url").order("date_earned", { ascending: false }),
+        supabase.from("honors").select("id, award, issuer, description, awarded_on").order("awarded_on", { ascending: false }),
       ]);
 
       setProfile(profileResponse.data ?? null);
@@ -169,6 +177,7 @@ const Index = () => {
       setExperience(experienceResponse.data ?? []);
       setEducation(educationResponse.data ?? []);
       setCertifications(certificationsResponse.data ?? []);
+      setHonors(honorsResponse.data ?? []);
     }
 
     fetchPortfolioData();
@@ -180,17 +189,19 @@ const Index = () => {
   const displayExperience = experience.length > 0 ? experience : fallbackExperience;
   const displayEducation = education.length > 0 ? education : fallbackEducation;
   const displayCertifications = certifications.length > 0 ? certifications : fallbackCertifications;
+  const displayHonors = honors.length > 0 ? honors : fallbackHonors;
 
   return (
     <>
       <Navbar profile={displayProfile} navLinks={navLinks} />
       <main>
         <Hero profile={displayProfile} />
-        <TechStack skills={displaySkills} />
+        <Skills skills={displaySkills} />
         <Projects projects={displayProjects} />
         <Experience experience={displayExperience} />
         <Education education={displayEducation} />
         <Certifications certifications={displayCertifications} />
+        <Honors honors={displayHonors} />
         <BentoGrid about={fallbackAbout} />
         <Contact />
       </main>
