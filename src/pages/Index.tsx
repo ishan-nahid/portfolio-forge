@@ -1,16 +1,19 @@
+import { lazy, Suspense, useEffect, useState } from "react";
 import { Navbar } from "@/components/portfolio/Navbar";
 import { Hero } from "@/components/portfolio/Hero";
 import { Skills, type SkillData } from "@/components/portfolio/Skills";
 import { Projects } from "@/components/portfolio/Projects";
-import { Experience } from "@/components/portfolio/Experience";
 import { Education, type EducationData } from "@/components/portfolio/Education";
-import { Certifications, type CertificationData } from "@/components/portfolio/Certifications";
 import { Honors, type HonorData } from "@/components/portfolio/Honors";
 import { BentoGrid } from "@/components/portfolio/BentoGrid";
-import { Contact } from "@/components/portfolio/Contact";
 import { Footer } from "@/components/portfolio/Footer";
-import { useEffect, useState } from "react";
+import { SectionSkeleton, HeroSkeleton } from "@/components/portfolio/PortfolioSkeletons";
 import { supabase } from "@/integrations/supabase/client";
+import type { CertificationData } from "@/components/portfolio/Certifications";
+
+const Experience = lazy(() => import("@/components/portfolio/Experience").then((module) => ({ default: module.Experience })));
+const Certifications = lazy(() => import("@/components/portfolio/Certifications").then((module) => ({ default: module.Certifications })));
+const Contact = lazy(() => import("@/components/portfolio/Contact").then((module) => ({ default: module.Contact })));
 
 type ProfileData = {
   full_name: string;
@@ -64,90 +67,29 @@ const navLinks = [
 ];
 
 const fallbackProfile: ProfileData = {
-  full_name: "John Doe",
-  role: "Software Engineer",
-  bio: "Building awesome things.",
-  github_url: "#",
+  full_name: "Ishan Ahmad",
+  role: "Software Engineer & Problem Solver",
+  bio: "I am a Software Engineer based in Dhaka, Bangladesh, specializing in Python, C++, Django, and React. I love solving complex algorithmic problems and building high-performance products.",
+  github_url: "https://github.com/ishan-nahid",
   linkedin_url: "#",
   resume_url: "#",
   email: "",
   avatar_url: "",
 };
 
-const fallbackProjects: ProjectData[] = [
-  {
-    title: "Portfolio Platform",
-    description: "A full-stack portfolio with CMS controls and dynamic content rendering.",
-    github_url: "#",
-    live_url: "#",
-    image_url: "",
-  },
-];
-
-const fallbackSkills: SkillData[] = [
-  { name: "TypeScript", category: "Frontend" },
-  { name: "React", category: "Frontend" },
-  { name: "Supabase", category: "Backend" },
-  { name: "Cloudflare", category: "Platform" },
-];
-
-const fallbackExperience: ExperienceData[] = [
-  {
-    company: "Example Company",
-    role: "Software Engineer",
-    start_date: "2022",
-    end_date: "Present",
-    description: "Delivered production-ready features across frontend and backend systems.",
-  },
-];
-
-const fallbackEducation: EducationData[] = [
-  {
-    degree: "B.S. in Computer Science",
-    institution: "University of California, Berkeley",
-    start_date: "2018",
-    end_date: "2022",
-    description: "Focused on distributed systems, machine learning, and software engineering.",
-  },
-];
-
-const fallbackCertifications: CertificationData[] = [
-  {
-    title: "AWS Certified Solutions Architect",
-    issuer: "Amazon Web Services",
-    date_earned: "2024",
-    url: "#",
-  },
-];
-
-const fallbackHonors: HonorData[] = [
-  {
-    award: "Dean's Honor List",
-    issuer: "University of California, Berkeley",
-    description: "Recognized for academic excellence across six semesters.",
-    awarded_on: "2022",
-  },
-];
-
 const fallbackAbout: AboutData = {
   education: {
-    degree: "B.S. Computer Science",
-    university: "University of California, Berkeley",
-    gpa: "3.87 / 4.0",
-    coursework: ["Distributed Systems", "Machine Learning", "Computer Networks", "Database Systems", "Algorithms"],
+    degree: "B.Sc. in Computer Science & Engineering",
+    university: "Dhaka, Bangladesh",
+    gpa: "Focused on algorithms, systems, and software engineering",
+    coursework: ["Data Structures & Algorithms", "Competitive Programming", "Web Engineering", "Software Design"],
   },
   volunteering: [
-    "Mentor at Code.org — Teaching web development to underrepresented high school students.",
-    "Hackathon Organizer — CalHacks, 1500+ participants across 3 editions.",
-    "Open Source — Active contributor to React and Node.js ecosystems.",
+    "Community-focused problem solving through programming mentorship and peer support.",
+    "Knowledge sharing on development best practices and coding interview preparation.",
   ],
-  awards: [
-    "Dean's Honor List — 6 semesters",
-    "Google Summer of Code 2019 — Chromium project",
-    "1st Place — HackMIT 2020",
-    "AWS Certified Solutions Architect",
-  ],
-  hobbies: ["Rock climbing", "Mechanical keyboards", "Film photography", "Chess"],
+  awards: ["Champion competitive programmer", "Strong track record in algorithmic contests"],
+  hobbies: ["Competitive programming", "Building developer tools", "Learning new frameworks"],
 };
 
 const Index = () => {
@@ -158,9 +100,12 @@ const Index = () => {
   const [education, setEducation] = useState<EducationData[]>([]);
   const [certifications, setCertifications] = useState<CertificationData[]>([]);
   const [honors, setHonors] = useState<HonorData[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function fetchPortfolioData() {
+      setIsLoading(true);
+
       const [profileResponse, projectsResponse, skillsResponse, experienceResponse, educationResponse, certificationsResponse, honorsResponse] = await Promise.all([
         supabase.from("profile").select("full_name, role, bio, github_url, linkedin_url, resume_url, email, avatar_url").limit(1).maybeSingle(),
         supabase.from("projects").select("title, description, github_url, live_url, image_url"),
@@ -178,32 +123,39 @@ const Index = () => {
       setEducation(educationResponse.data ?? []);
       setCertifications(certificationsResponse.data ?? []);
       setHonors(honorsResponse.data ?? []);
+      setIsLoading(false);
     }
 
     fetchPortfolioData();
   }, []);
 
   const displayProfile = profile ?? fallbackProfile;
-  const displayProjects = projects.length > 0 ? projects : fallbackProjects;
-  const displaySkills = skills.length > 0 ? skills : fallbackSkills;
-  const displayExperience = experience.length > 0 ? experience : fallbackExperience;
-  const displayEducation = education.length > 0 ? education : fallbackEducation;
-  const displayCertifications = certifications.length > 0 ? certifications : fallbackCertifications;
-  const displayHonors = honors.length > 0 ? honors : fallbackHonors;
+  const displayAbout = fallbackAbout;
 
   return (
     <>
       <Navbar profile={displayProfile} navLinks={navLinks} />
       <main>
-        <Hero profile={displayProfile} />
-        <Skills skills={displaySkills} />
-        <Projects projects={displayProjects} />
-        <Experience experience={displayExperience} />
-        <Education education={displayEducation} />
-        <Certifications certifications={displayCertifications} />
-        <Honors honors={displayHonors} />
-        <BentoGrid about={fallbackAbout} />
-        <Contact />
+        {isLoading ? <HeroSkeleton /> : <Hero profile={displayProfile} />}
+        {isLoading ? <SectionSkeleton id="skills" /> : <Skills skills={skills} />}
+        {isLoading ? <SectionSkeleton id="work" /> : <Projects projects={projects} />}
+
+        <Suspense fallback={<SectionSkeleton id="experience" />}>
+          {isLoading ? <SectionSkeleton id="experience" /> : <Experience experience={experience} />}
+        </Suspense>
+
+        {isLoading ? <SectionSkeleton id="education" /> : <Education education={education} />}
+
+        <Suspense fallback={<SectionSkeleton id="certifications" />}>
+          {isLoading ? <SectionSkeleton id="certifications" /> : <Certifications certifications={certifications} />}
+        </Suspense>
+
+        {isLoading ? <SectionSkeleton id="honors" /> : <Honors honors={honors} />}
+        {isLoading ? <SectionSkeleton id="about" /> : <BentoGrid about={displayAbout} />}
+
+        <Suspense fallback={<SectionSkeleton id="contact" />}>
+          {isLoading ? <SectionSkeleton id="contact" /> : <Contact />}
+        </Suspense>
       </main>
       <Footer profile={displayProfile} />
     </>
