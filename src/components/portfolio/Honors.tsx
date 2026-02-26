@@ -1,45 +1,56 @@
-import { Sparkles } from "lucide-react";
-import { useScrollReveal } from "@/hooks/useScrollReveal";
+import { motion } from "framer-motion";
+import { Star } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
-export type HonorData = {
-  id?: string;
-  award: string;
-  issuer: string;
-  description: string;
-  awarded_on: string;
-};
+const Honors = ({ honors, isLoading }: any) => {
+  if (isLoading) {
+    return (
+      <section id="honors" className="section-container">
+        <Skeleton className="h-10 w-48 mb-4" />
+        <Skeleton className="h-5 w-64 mb-12" />
+        {[1, 2, 3].map((i) => <Skeleton key={i} className="h-24 rounded-xl mb-4" />)}
+      </section>
+    );
+  }
 
-type HonorsProps = {
-  honors: HonorData[];
-};
-
-export function Honors({ honors }: HonorsProps) {
-  const ref = useScrollReveal<HTMLElement>();
+  if (!honors || honors.length === 0) return null;
 
   return (
-    <section id="honors" ref={ref} className="reveal px-4 py-28">
-      <div className="container mx-auto max-w-4xl">
-        <h2 className="mb-2 text-center text-xs font-semibold uppercase tracking-[0.34em] text-primary/90">Honors</h2>
-        <p className="mb-14 text-center text-3xl font-bold tracking-tight text-foreground sm:text-4xl">Recognition and milestones</p>
+    <section id="honors" className="section-container">
+      <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+        <h2 className="section-title">Honors & <span className="gradient-text">Awards</span></h2>
+        <p className="section-subtitle">Recognition & achievements</p>
+      </motion.div>
 
-        {honors.length === 0 ? (
-          <p className="rounded-2xl border border-dashed border-white/15 bg-card/40 px-4 py-12 text-center text-muted-foreground">Honors and awards will appear here.</p>
-        ) : (
-          <div className="relative space-y-8 pl-8 before:absolute before:bottom-1 before:left-3 before:top-1 before:w-px before:bg-white/10 sm:pl-10 sm:before:left-4">
-            {honors.map((honor) => (
-              <article key={`${honor.award}-${honor.awarded_on}`} className="relative rounded-2xl border border-white/10 bg-card/70 p-5 shadow-[0_16px_50px_hsl(var(--background)/0.72)] backdrop-blur-xl">
-                <div className="absolute -left-[1.7rem] top-5 rounded-full border border-primary/30 bg-primary/10 p-1.5 sm:-left-[2rem]">
-                  <Sparkles className="h-3.5 w-3.5 text-primary" />
-                </div>
-                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary/90">{honor.awarded_on || "Awarded"}</p>
-                <h3 className="mt-1 text-lg font-semibold text-foreground">{honor.award || "Recognition"}</h3>
-                <p className="text-sm text-muted-foreground">{honor.issuer || "Issuer"}</p>
-                <p className="mt-3 text-sm leading-relaxed text-foreground/85">{honor.description}</p>
-              </article>
-            ))}
-          </div>
-        )}
+      <div className="relative">
+        <div className="absolute left-4 top-0 bottom-0 w-px bg-border" />
+
+        {honors.map((honor: any, i: number) => (
+          <motion.div
+            key={honor.id || i}
+            initial={{ opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: i * 0.1 }}
+            className="relative pl-12 mb-6"
+          >
+            <div className="absolute left-2 top-4 w-5 h-5 rounded-full bg-primary/20 border-2 border-primary flex items-center justify-center">
+              <Star className="h-2.5 w-2.5 text-primary" />
+            </div>
+
+            <div className="glass-card-hover p-5">
+              <div className="flex flex-wrap justify-between gap-2 mb-1">
+                <h3 className="font-semibold">{honor.title}</h3>
+                {honor.date && <span className="text-xs text-muted-foreground font-mono">{honor.date}</span>}
+              </div>
+              <p className="text-sm text-primary mb-1">{honor.organization}</p>
+              {honor.description && <p className="text-sm text-muted-foreground">{honor.description}</p>}
+            </div>
+          </motion.div>
+        ))}
       </div>
     </section>
   );
-}
+};
+
+export default Honors;

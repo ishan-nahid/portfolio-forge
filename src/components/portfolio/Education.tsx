@@ -1,50 +1,74 @@
+import { motion } from "framer-motion";
 import { GraduationCap } from "lucide-react";
-import { useScrollReveal } from "@/hooks/useScrollReveal";
+import { Skeleton } from "@/components/ui/skeleton";
 
-export type EducationData = {
-  id?: string;
-  degree: string;
-  institution: string;
-  start_date: string;
-  end_date: string;
-  description: string;
-};
-
-type EducationProps = {
-  education: EducationData[];
-};
-
-export function Education({ education }: EducationProps) {
-  const ref = useScrollReveal<HTMLElement>();
+const Education = ({ education, isLoading }: any) => {
+  if (isLoading) {
+    return (
+      <section id="education" className="section-container">
+        <Skeleton className="h-10 w-48 mb-4" />
+        <Skeleton className="h-5 w-64 mb-12" />
+        {[1, 2].map((i) => <Skeleton key={i} className="h-48 rounded-xl mb-6" />)}
+      </section>
+    );
+  }
 
   return (
-    <section id="education" ref={ref} className="reveal py-28 px-4">
-      <div className="container mx-auto max-w-5xl">
-        <h2 className="mb-2 text-center text-xs font-semibold uppercase tracking-[0.34em] text-primary/90">Education</h2>
-        <p className="mb-16 text-center text-3xl font-bold tracking-tight text-foreground sm:text-4xl">Academic foundation</p>
+    <section id="education" className="section-container">
+      <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+        <h2 className="section-title"><span className="gradient-text">Education</span></h2>
+        <p className="section-subtitle">Academic background</p>
+      </motion.div>
 
-        {education.length === 0 ? (
-          <p className="rounded-2xl border border-dashed border-white/15 bg-card/40 px-4 py-12 text-center text-muted-foreground">Education history will be published soon.</p>
-        ) : (
-          <div className="grid gap-6 md:grid-cols-2">
-            {education.map((item) => (
-              <article key={`${item.institution}-${item.degree}-${item.start_date}`} className="rounded-2xl border border-white/10 bg-card/70 p-6 shadow-[0_18px_58px_hsl(var(--background)/0.75)] backdrop-blur-xl transition-transform duration-300 hover:-translate-y-1">
-                <div className="mb-4 flex items-start justify-between gap-3">
-                  <div>
-                    <h3 className="text-lg font-semibold text-foreground">{item.degree || "Degree Program"}</h3>
-                    <p className="text-sm text-primary/90">{item.institution || "Institution"}</p>
-                  </div>
-                  <GraduationCap className="h-5 w-5 text-primary/80" />
+      <div className="space-y-6">
+        {education?.map((edu: any, i: number) => (
+          <motion.div
+            key={edu.id || i}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: i * 0.1 }}
+            className="glass-card-hover p-6"
+          >
+            <div className="flex items-start gap-4">
+              <div className="p-2 rounded-lg bg-primary/10 text-primary shrink-0">
+                <GraduationCap className="h-6 w-6" />
+              </div>
+              <div className="flex-1">
+                <div className="flex flex-wrap justify-between gap-2 mb-1">
+                  <h3 className="font-semibold text-lg">{edu.degree}</h3>
+                  {edu.period && <span className="text-xs text-muted-foreground font-mono">{edu.period}</span>}
                 </div>
-                <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                  {item.start_date || "Start"} — {item.end_date || "End"}
-                </p>
-                <p className="text-sm leading-relaxed text-muted-foreground">{item.description}</p>
-              </article>
-            ))}
-          </div>
-        )}
+                <p className="text-primary text-sm mb-2">{edu.institution}{edu.location ? ` · ${edu.location}` : ""}</p>
+
+                {edu.gpa && <p className="text-sm text-muted-foreground mb-1">GPA: {edu.gpa}</p>}
+                {edu.focus && <p className="text-sm text-muted-foreground mb-1">Focus: {edu.focus}</p>}
+                {edu.thesis && <p className="text-sm text-muted-foreground mb-2">Thesis: {edu.thesis}</p>}
+
+                {edu.courses && edu.courses.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 mb-2">
+                    {edu.courses.map((c: string) => (
+                      <span key={c} className="text-xs font-mono px-2 py-0.5 rounded bg-muted text-muted-foreground">{c}</span>
+                    ))}
+                  </div>
+                )}
+
+                {edu.achievements && edu.achievements.length > 0 && (
+                  <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
+                    {edu.achievements.map((a: string, j: number) => <li key={j}>{a}</li>)}
+                  </ul>
+                )}
+              </div>
+            </div>
+          </motion.div>
+        ))}
       </div>
+
+      {(!education || education.length === 0) && (
+        <p className="text-muted-foreground text-center py-8">Education will appear here once added via the admin dashboard.</p>
+      )}
     </section>
   );
-}
+};
+
+export default Education;

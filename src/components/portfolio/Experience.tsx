@@ -1,79 +1,92 @@
-import { useScrollReveal } from "@/hooks/useScrollReveal";
+import { motion } from "framer-motion";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 
-type ExperienceData = {
-  company: string;
-  role: string;
-  start_date: string;
-  end_date: string;
-  description: string;
-};
-
-type ExperienceItem = {
-  role: string;
-  company: string;
-  period: string;
-  bullets: string[];
-};
-
-type ExperienceProps = {
-  experience: ExperienceData[];
-};
-
-export function Experience({ experience: dbExperience }: ExperienceProps) {
-  const ref = useScrollReveal<HTMLElement>();
-
-  const experience: ExperienceItem[] = dbExperience.map((e) => ({
-    role: e.role || "Software Engineer",
-    company: e.company || "Confidential",
-    period: `${e.start_date || "Start"} — ${e.end_date || "Present"}`,
-    bullets: e.description.split("\n").filter(Boolean),
-  }));
+const Experience = ({ experience: experiences, isLoading }: any) => {
+  if (isLoading) {
+    return (
+      <section id="experience" className="section-container">
+        <Skeleton className="h-10 w-48 mb-4" />
+        <Skeleton className="h-5 w-64 mb-12" />
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="mb-6">
+            <Skeleton className="h-40 rounded-xl" />
+          </div>
+        ))}
+      </section>
+    );
+  }
 
   return (
-    <section id="experience" ref={ref} className="reveal py-28 px-4">
-      <div className="container mx-auto max-w-5xl">
-        <h2 className="mb-2 text-center text-xs font-semibold uppercase tracking-[0.34em] text-primary/90">Experience</h2>
-        <p className="mb-16 text-center text-3xl font-bold tracking-tight text-foreground sm:text-4xl">Engineering roles and outcomes</p>
+    <section id="experience" className="section-container">
+      <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+        <h2 className="section-title">Work <span className="gradient-text">Experience</span></h2>
+        <p className="section-subtitle">Where I've contributed</p>
+      </motion.div>
 
-        {experience.length === 0 ? (
-          <p className="rounded-2xl border border-dashed border-white/15 bg-card/40 px-4 py-12 text-center text-muted-foreground">Experience details will be added shortly.</p>
-        ) : (
-          <div className="relative">
-            <div className="absolute left-4 top-0 bottom-0 w-px bg-white/10 lg:left-1/2 lg:-translate-x-px" />
+      <div className="relative">
+        {/* Timeline line */}
+        <div className="absolute left-4 top-0 bottom-0 w-px bg-border hidden md:block" />
 
-            <div className="flex flex-col gap-12">
-              {experience.map((exp, i) => (
-                <TimelineEntry key={`${exp.company}-${i}`} entry={exp} index={i} />
-              ))}
+        {experiences?.map((exp: any, i: number) => (
+          <motion.div
+            key={exp.id || i}
+            initial={{ opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: i * 0.1 }}
+            className="relative md:pl-12 mb-8"
+          >
+            {/* Timeline dot */}
+            <div className="absolute left-3 top-6 w-3 h-3 rounded-full bg-primary border-2 border-background hidden md:block" />
+
+            <div className="glass-card-hover p-6">
+              <div className="flex flex-wrap items-start justify-between gap-2 mb-2">
+                <div>
+                  <h3 className="font-semibold text-lg">{exp.title}</h3>
+                  <p className="text-primary text-sm">{exp.company}{exp.location ? ` · ${exp.location}` : ""}</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  {exp.type && (
+                    <Badge variant="outline" className="text-xs border-primary/30 text-primary capitalize">
+                      {exp.type}
+                    </Badge>
+                  )}
+                  {exp.period && <span className="text-xs text-muted-foreground font-mono">{exp.period}</span>}
+                </div>
+              </div>
+
+              {exp.description && (
+                <p className="text-sm text-muted-foreground mb-3 leading-relaxed">{exp.description}</p>
+              )}
+
+              {exp.achievements && exp.achievements.length > 0 && (
+                <ul className="text-sm text-muted-foreground space-y-1 mb-3 list-disc list-inside">
+                  {exp.achievements.map((a: string, j: number) => (
+                    <li key={j}>{a}</li>
+                  ))}
+                </ul>
+              )}
+
+              {exp.technologies && exp.technologies.length > 0 && (
+                <div className="flex flex-wrap gap-1.5">
+                  {exp.technologies.map((t: string) => (
+                    <span key={t} className="text-xs font-mono px-2 py-0.5 rounded bg-muted text-muted-foreground">
+                      {t}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
-          </div>
-        )}
+          </motion.div>
+        ))}
       </div>
+
+      {(!experiences || experiences.length === 0) && (
+        <p className="text-muted-foreground text-center py-8">Experience will appear here once added via the admin dashboard.</p>
+      )}
     </section>
   );
-}
+};
 
-function TimelineEntry({ entry, index }: { entry: ExperienceItem; index: number }) {
-  const ref = useScrollReveal<HTMLDivElement>();
-  const isLeft = index % 2 === 0;
-
-  return (
-    <div ref={ref} className={`reveal relative pl-12 lg:pl-0 lg:w-1/2 ${isLeft ? "lg:pr-12 lg:self-start" : "lg:pl-12 lg:self-end"}`}>
-      <div className={`absolute top-2 left-3 h-3 w-3 rounded-full border-2 border-background bg-primary lg:left-auto ${isLeft ? "lg:-right-1.5" : "lg:-left-1.5"}`} />
-
-      <div className="rounded-2xl border border-white/10 bg-card/70 p-6 shadow-[0_20px_60px_hsl(var(--background)/0.75)] backdrop-blur-xl">
-        <p className="mb-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-primary/90">{entry.period}</p>
-        <h3 className="text-lg font-semibold text-foreground">{entry.role}</h3>
-        <p className="mb-3 text-sm text-muted-foreground">{entry.company}</p>
-        <ul className="space-y-2">
-          {entry.bullets.map((b, j) => (
-            <li key={j} className="flex gap-2 text-sm leading-relaxed text-muted-foreground">
-              <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-primary/70" />
-              {b}
-            </li>
-          ))}
-        </ul>
-      </div>
-    </div>
-  );
-}
+export default Experience;
