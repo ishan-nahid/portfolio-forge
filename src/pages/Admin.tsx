@@ -19,15 +19,18 @@ type Skill = { id: string; name: string; icon_name?: string | null; category: st
 type Project = { id: string; title: string; description: string; github_url: string; live_url: string; image_url: string };
 type Experience = { id: string; company: string; role: string; start_date: string; end_date: string; description: string };
 type Education = { id: string; degree: string; institution: string; start_date: string; end_date: string; description: string };
-type Certification = { id: string; title: string; issuer: string; date_earned: string; url: string };
-type Honor = { id: string; award: string; issuer: string; description: string; awarded_on: string };
+// Updated: url -> credential_id
+type Certification = { id: string; title: string; issuer: string; date_earned: string; credential_id: string };
+// Updated: award -> title, awarded_on -> date_received
+type Honor = { id: string; title: string; issuer: string; description: string; date_received: string };
 
 const defaultSkillForm = { name: "", icon_name: "", category: "Frontend" };
 const defaultProjectForm = { title: "", description: "", github_url: "", live_url: "", image_url: "" };
 const defaultExperienceForm = { company: "", role: "", start_date: "", end_date: "", description: "" };
 const defaultEducationForm = { degree: "", institution: "", start_date: "", end_date: "", description: "" };
-const defaultCertificationForm = { title: "", issuer: "", date_earned: "", url: "" };
-const defaultHonorForm = { award: "", issuer: "", description: "", awarded_on: "" };
+// Updated keys
+const defaultCertificationForm = { title: "", issuer: "", date_earned: "", credential_id: "" };
+const defaultHonorForm = { title: "", issuer: "", description: "", date_received: "" };
 
 export default function Admin() {
   const [activeTab, setActiveTab] = useState("profile");
@@ -73,7 +76,8 @@ export default function Admin() {
       supabase.from("experience").select("*").order("start_date", { ascending: false }),
       supabase.from("education").select("*").order("start_date", { ascending: false }),
       supabase.from("certifications").select("*").order("date_earned", { ascending: false }),
-      supabase.from("honors").select("*").order("awarded_on", { ascending: false }),
+      // Updated sort to use date_received
+      supabase.from("honors").select("*").order("date_received", { ascending: false }),
     ]);
 
     if (profRes.data) setProfile(profRes.data as Profile);
@@ -227,12 +231,14 @@ export default function Admin() {
             title="Certifications"
             description="Manage credential cards shown on the public portfolio."
             columns={["Title", "Issuer", "Date", "URL"]}
-            rows={certifications.map((item) => [item.title, item.issuer, item.date_earned, item.url || "—", item.id])}
+            // Updated mapping
+            rows={certifications.map((item) => [item.title, item.issuer, item.date_earned, item.credential_id || "—", item.id])}
             onAdd={() => { setCertificationForm(defaultCertificationForm); setEditIds((p) => ({ ...p, certification: null })); setDialogOpen((d) => ({ ...d, certifications: true })); }}
             onEdit={(id) => {
               const item = certifications.find((cert) => cert.id === id);
               if (!item) return;
-              setCertificationForm({ title: item.title, issuer: item.issuer, date_earned: item.date_earned, url: item.url });
+              // Updated mapping
+              setCertificationForm({ title: item.title, issuer: item.issuer, date_earned: item.date_earned, credential_id: item.credential_id });
               setEditIds((p) => ({ ...p, certification: id }));
               setDialogOpen((d) => ({ ...d, certifications: true }));
             }}
@@ -245,12 +251,14 @@ export default function Admin() {
             title="Honors"
             description="Manage timeline awards and notable recognitions."
             columns={["Award", "Issuer", "Awarded", "Description"]}
-            rows={honors.map((item) => [item.award, item.issuer, item.awarded_on, item.description, item.id])}
+            // Updated mapping
+            rows={honors.map((item) => [item.title, item.issuer, item.date_received, item.description, item.id])}
             onAdd={() => { setHonorForm(defaultHonorForm); setEditIds((p) => ({ ...p, honor: null })); setDialogOpen((d) => ({ ...d, honors: true })); }}
             onEdit={(id) => {
               const item = honors.find((honor) => honor.id === id);
               if (!item) return;
-              setHonorForm({ award: item.award, issuer: item.issuer, description: item.description, awarded_on: item.awarded_on });
+              // Updated mapping
+              setHonorForm({ title: item.title, issuer: item.issuer, description: item.description, date_received: item.date_received });
               setEditIds((p) => ({ ...p, honor: id }));
               setDialogOpen((d) => ({ ...d, honors: true }));
             }}
@@ -287,7 +295,8 @@ export default function Admin() {
             <Input placeholder="Title" value={certificationForm.title} onChange={(e) => setCertificationForm({ ...certificationForm, title: e.target.value })} />
             <Input placeholder="Issuer" value={certificationForm.issuer} onChange={(e) => setCertificationForm({ ...certificationForm, issuer: e.target.value })} />
             <Input placeholder="Date earned" value={certificationForm.date_earned} onChange={(e) => setCertificationForm({ ...certificationForm, date_earned: e.target.value })} />
-            <Input placeholder="Credential URL" value={certificationForm.url} onChange={(e) => setCertificationForm({ ...certificationForm, url: e.target.value })} />
+            {/* Updated mapping */}
+            <Input placeholder="Credential URL" value={certificationForm.credential_id} onChange={(e) => setCertificationForm({ ...certificationForm, credential_id: e.target.value })} />
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDialogOpen((d) => ({ ...d, certifications: false }))}>Cancel</Button>
@@ -303,9 +312,10 @@ export default function Admin() {
             <DialogDescription>Manage timeline entries for your honors and awards section.</DialogDescription>
           </DialogHeader>
           <div className="space-y-3">
-            <Input placeholder="Award" value={honorForm.award} onChange={(e) => setHonorForm({ ...honorForm, award: e.target.value })} />
+            {/* Updated mapping */}
+            <Input placeholder="Award Title" value={honorForm.title} onChange={(e) => setHonorForm({ ...honorForm, title: e.target.value })} />
             <Input placeholder="Issuer" value={honorForm.issuer} onChange={(e) => setHonorForm({ ...honorForm, issuer: e.target.value })} />
-            <Input placeholder="Awarded on" value={honorForm.awarded_on} onChange={(e) => setHonorForm({ ...honorForm, awarded_on: e.target.value })} />
+            <Input placeholder="Date Received" value={honorForm.date_received} onChange={(e) => setHonorForm({ ...honorForm, date_received: e.target.value })} />
             <textarea className="h-24 w-full rounded-md border border-border bg-background p-2" placeholder="Description" value={honorForm.description} onChange={(e) => setHonorForm({ ...honorForm, description: e.target.value })} />
           </div>
           <DialogFooter>
