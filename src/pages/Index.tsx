@@ -29,9 +29,9 @@ type ProfileData = {
 };
 
 type ProjectData = { title: string; description: string; github_url: string; live_url: string; image_url: string; };
-type ExperienceData = { company: string; role: string; start_date: string; end_date: string; description: string; };
+type ExperienceData = { company: string; role: string; start_date: string; end_date: string; description: string; title?: string; period?: string; };
 type SkillData = { id: string; name: string; category: string; };
-type EducationData = { id: string; degree: string; institution: string; start_date: string; end_date: string; description: string; };
+type EducationData = { id: string; degree: string; institution: string; start_date: string; end_date: string; description: string; period?: string; };
 type CertificationData = { id: string; title: string; issuer: string; date_earned: string; credential_id: string; };
 type HonorData = { id: string; title: string; issuer: string; date_received: string; description: string; };
 
@@ -73,7 +73,6 @@ const Index = () => {
         supabase.from("skills").select("id, name, category").order("category"),
         supabase.from("experience").select("company, role, start_date, end_date, description").order("start_date", { ascending: false }),
         supabase.from("education").select("id, degree, institution, start_date, end_date, description").order("start_date", { ascending: false }),
-        // Notice: Updated to match the exact SQL columns we created earlier
         supabase.from("certifications").select("id, title, issuer, date_earned, credential_id").order("date_earned", { ascending: false }),
         supabase.from("honors").select("id, title, issuer, date_received, description").order("date_received", { ascending: false }),
       ]);
@@ -81,8 +80,22 @@ const Index = () => {
       setProfile(profileRes.data ?? null);
       setProjects((projectsRes.data ?? []).map(p => ({ ...p, description: normalizeText(p.description) })));
       setSkills(skillsRes.data ?? []);
-      setExperience((experienceRes.data ?? []).map(e => ({ ...e, description: normalizeText(e.description) })));
-      setEducation((educationRes.data ?? []).map(e => ({ ...e, description: normalizeText(e.description) })));
+      
+      // MAPPED: Role -> Title, and Dates -> Period
+      setExperience((experienceRes.data ?? []).map(e => ({ 
+        ...e, 
+        title: e.role,
+        period: `${e.start_date} — ${e.end_date}`,
+        description: normalizeText(e.description) 
+      })));
+      
+      // MAPPED: Dates -> Period
+      setEducation((educationRes.data ?? []).map(e => ({ 
+        ...e, 
+        period: `${e.start_date} — ${e.end_date}`,
+        description: normalizeText(e.description) 
+      })));
+      
       setCertifications(certsRes.data ?? []);
       setHonors((honorsRes.data ?? []).map(h => ({ ...h, description: normalizeText(h.description) })));
       
@@ -118,7 +131,6 @@ const Index = () => {
         </Suspense>
 
         <Suspense fallback={<ComponentSkeleton />}>
-          {/* Changed 'about' prop to 'profile' to match the updated About.tsx */}
           <About profile={displayProfile} isLoading={isLoading} />
         </Suspense>
 
