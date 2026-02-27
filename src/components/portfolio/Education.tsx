@@ -41,6 +41,9 @@ const Education = ({ education, isLoading }: any) => {
                 </div>
                 <p className="text-primary text-sm mb-2">{edu.institution}{edu.location ? ` · ${edu.location}` : ""}</p>
 
+                {/* ADDED DESCRIPTION FIELD HERE */}
+                {edu.description && <p className="text-sm text-muted-foreground mb-3 whitespace-pre-wrap leading-relaxed">{edu.description}</p>}
+
                 {edu.gpa && <p className="text-sm text-muted-foreground mb-1">GPA: {edu.gpa}</p>}
                 {edu.focus && <p className="text-sm text-muted-foreground mb-1">Focus: {edu.focus}</p>}
                 {edu.thesis && <p className="text-sm text-muted-foreground mb-2">Thesis: {edu.thesis}</p>}
