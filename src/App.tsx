@@ -17,6 +17,7 @@ import ProtectedRoute from "./components/auth/ProtectedRoute";
 
 // Admin Modules
 import ManageProfile from "./pages/admin/ManageProfile";
+import ManageBlogs from "./pages/admin/ManageBlogs";
 
 const queryClient = new QueryClient();
 
@@ -52,13 +53,15 @@ const App = () => (
               </div>
             } />
             
-            {/* Profile Management Module (/admin/profile) */}
+            {/* Active Modules */}
             <Route path="profile" element={<ManageProfile />} />
+            <Route path="blogs" element={<ManageBlogs />} />
             
-            {/* Future Admin Modules will be uncommented here as we build them: */}
-            {/* <Route path="blogs" element={<ManageBlogs />} /> */}
-            {/* <Route path="projects" element={<ManageProjects />} /> */}
-            {/* <Route path="experience" element={<ManageExperience />} /> */}
+            {/* Temporary Placeholders (Stops the 404s!) */}
+            <Route path="projects" element={<div className="p-8"><h2 className="text-2xl font-bold">Projects CRUD coming soon...</h2></div>} />
+            <Route path="experience" element={<div className="p-8"><h2 className="text-2xl font-bold">Experience CRUD coming soon...</h2></div>} />
+            <Route path="education" element={<div className="p-8"><h2 className="text-2xl font-bold">Education CRUD coming soon...</h2></div>} />
+            <Route path="skills" element={<div className="p-8"><h2 className="text-2xl font-bold">Skills CRUD coming soon...</h2></div>} />
           </Route>
 
           {/* Catch-all Route */}
