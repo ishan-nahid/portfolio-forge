@@ -21,7 +21,7 @@ const Contact = ({ profile }: any) => {
   };
 
   const contactInfo = [
-    { icon: Mail, label: profile?.email || "contact@example.com", href: `mailto:${profile?.email || ""}` },
+    { icon: Mail, label: profile?.email || "contact@ishanahmad.com", href: `mailto:${profile?.email || ""}` },
     ...(profile?.phone ? [{ icon: Phone, label: profile.phone, href: `tel:${profile.phone}` }] : []),
     ...(profile?.location ? [{ icon: MapPin, label: profile.location, href: "#" }] : []),
   ];
