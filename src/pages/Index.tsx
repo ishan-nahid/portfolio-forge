@@ -28,7 +28,6 @@ type ProfileData = {
   resume_url?: string;
   email?: string;
   avatar_url?: string;
-  // NEW FIELDS BELOW
   why_hire_me_intro?: string;
   why_hire_me_cp?: string;
   why_hire_me_bullets?: string[];
@@ -44,11 +43,11 @@ type ProjectData = {
   challenge?: string;
   solution?: string;
   impact?: string;
-  tech_stack_json?: string[]; // We added this to the DB
+  tech_stack_json?: string[];
   github_url?: string;
   live_url?: string;
   image_url?: string;
-  project_type?: 'featured' | 'academic'; // NEW
+  project_type?: 'featured' | 'academic';
 };
 
 type ExperienceData = {
@@ -56,9 +55,9 @@ type ExperienceData = {
   role: string;
   start_date: string;
   end_date: string;
-  end_date_text?: string; // We added this to the DB
+  end_date_text?: string;
   description: string;
-  bullets?: string[]; // We added this to the DB
+  bullets?: string[];
   type?: string; 
   title?: string;
   period?: string;
@@ -124,6 +123,7 @@ const Index = () => {
         honorsRes,
         problemRes,
         openSourceRes,
+        settingsRes, // <-- NEW: Fetching settings for resume
       ] = await Promise.all([
         supabase.from("profile").select("*").limit(1).maybeSingle(),
         supabase.from("projects").select("*"),
@@ -134,9 +134,16 @@ const Index = () => {
         supabase.from("honors").select("*").order("date_received", { ascending: false }),
         supabase.from("problem_solving").select("*").order("date", { ascending: false }),
         supabase.from("open_source").select("*").order("date", { ascending: false }),
+        supabase.from("settings").select("value").eq("key", "resume_url").maybeSingle(), // <-- NEW
       ]);
 
-      setProfile(profileRes.data ?? null);
+      // Inject the resume URL directly into the profile data if it exists
+      let profileData = profileRes.data ?? null;
+      if (profileData && settingsRes.data?.value) {
+        profileData.resume_url = settingsRes.data.value;
+      }
+      setProfile(profileData);
+
       setProjects((projectsRes.data ?? []).map(p => ({ ...p, description: normalizeText(p.description) })));
       setSkills(skillsRes.data ?? []);
 
