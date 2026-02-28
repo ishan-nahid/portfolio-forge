@@ -5,8 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Loader2, Plus, Edit2, Trash2, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 
-type Experience = { id: string; company: string; role: string; duration: string; description: string; };
-const defaultExp = { company: "", role: "", duration: "", description: "" };
+type Experience = { id: string; company: string; role: string; start_date: string; end_date: string; description: string; type?: string; };
+const defaultExp = { company: "", role: "", start_date: "", end_date: "", description: "", type: "work" };
 
 export default function ManageExperience() {
   const [experience, setExperience] = useState<Experience[]>([]);
@@ -20,7 +20,7 @@ export default function ManageExperience() {
 
   const fetchExperience = async () => {
     setLoading(true);
-    const { data } = await supabase.from("experience").select("*").order("id", { ascending: false });
+    const { data } = await supabase.from("experience").select("*").order("start_date", { ascending: false });
     setExperience(data || []);
     setLoading(false);
   };
@@ -53,10 +53,28 @@ export default function ManageExperience() {
   if (isEditing) return (
     <div className="space-y-4 max-w-2xl">
       <Button variant="ghost" onClick={() => setIsEditing(false)}><ArrowLeft className="mr-2 h-4 w-4"/> Back</Button>
-      <Input placeholder="Company" value={currentExp.company || ""} onChange={e => setCurrentExp({...currentExp, company: e.target.value})} />
-      <Input placeholder="Role (e.g. Frontend Dev)" value={currentExp.role || ""} onChange={e => setCurrentExp({...currentExp, role: e.target.value})} />
-      <Input placeholder="Duration (e.g. 2021 - Present)" value={currentExp.duration || ""} onChange={e => setCurrentExp({...currentExp, duration: e.target.value})} />
-      <textarea className="h-32 w-full rounded-md border p-3" placeholder="Description" value={currentExp.description || ""} onChange={e => setCurrentExp({...currentExp, description: e.target.value})} />
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="text-sm font-medium mb-1 block">Company</label>
+          <Input placeholder="Company" value={currentExp.company || ""} onChange={e => setCurrentExp({...currentExp, company: e.target.value})} />
+        </div>
+        <div>
+          <label className="text-sm font-medium mb-1 block">Role</label>
+          <Input placeholder="Role (e.g. Frontend Dev)" value={currentExp.role || ""} onChange={e => setCurrentExp({...currentExp, role: e.target.value})} />
+        </div>
+        <div>
+          <label className="text-sm font-medium mb-1 block">Start Date</label>
+          <Input placeholder="e.g. Jan 2022" value={currentExp.start_date || ""} onChange={e => setCurrentExp({...currentExp, start_date: e.target.value})} />
+        </div>
+        <div>
+          <label className="text-sm font-medium mb-1 block">End Date</label>
+          <Input placeholder="e.g. Present" value={currentExp.end_date || ""} onChange={e => setCurrentExp({...currentExp, end_date: e.target.value})} />
+        </div>
+      </div>
+      <div>
+        <label className="text-sm font-medium mb-1 block">Description</label>
+        <textarea className="h-32 w-full rounded-md border border-border bg-background p-3 text-sm" placeholder="Description" value={currentExp.description || ""} onChange={e => setCurrentExp({...currentExp, description: e.target.value})} />
+      </div>
       <Button onClick={saveExperience} disabled={saving}>{saving ? "Saving..." : "Save Experience"}</Button>
     </div>
   );
@@ -70,7 +88,7 @@ export default function ManageExperience() {
       <div className="grid gap-4">
         {experience.map(exp => (
           <div key={exp.id} className="flex justify-between rounded-lg border bg-card p-4">
-            <div><h3 className="font-bold">{exp.role} at {exp.company}</h3><p className="text-sm text-muted-foreground">{exp.duration}</p></div>
+            <div><h3 className="font-bold">{exp.role} at {exp.company}</h3><p className="text-sm text-muted-foreground">{exp.start_date} — {exp.end_date}</p></div>
             <div className="flex gap-2">
               <Button variant="ghost" size="icon" onClick={() => openEditor(exp)}><Edit2 className="h-4 w-4"/></Button>
               <Button variant="ghost" size="icon" onClick={() => deleteExperience(exp.id)} className="text-destructive"><Trash2 className="h-4 w-4"/></Button>
