@@ -18,6 +18,10 @@ import ProtectedRoute from "./components/auth/ProtectedRoute";
 // Admin Modules
 import ManageProfile from "./pages/admin/ManageProfile";
 import ManageBlogs from "./pages/admin/ManageBlogs";
+import ManageProjects from "./pages/admin/ManageProjects";
+import ManageExperience from "./pages/admin/ManageExperience";
+import ManageEducation from "./pages/admin/ManageEducation";
+import ManageSkills from "./pages/admin/ManageSkills";
 
 const queryClient = new QueryClient();
 
@@ -37,14 +41,8 @@ const App = () => (
           <Route path="/admin/login" element={<Login />} />
 
           {/* Secure Admin Dashboard (Nested Routes) */}
-          <Route 
-            path="/admin" 
-            element={
-              <ProtectedRoute>
-                <AdminLayout />
-              </ProtectedRoute>
-            }
-          >
+          <Route path="/admin" element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
+            
             {/* Default Dashboard View (/admin) */}
             <Route index element={
               <div className="space-y-2">
@@ -56,12 +54,11 @@ const App = () => (
             {/* Active Modules */}
             <Route path="profile" element={<ManageProfile />} />
             <Route path="blogs" element={<ManageBlogs />} />
+            <Route path="projects" element={<ManageProjects />} />
+            <Route path="experience" element={<ManageExperience />} />
+            <Route path="education" element={<ManageEducation />} />
+            <Route path="skills" element={<ManageSkills />} />
             
-            {/* Temporary Placeholders (Stops the 404s!) */}
-            <Route path="projects" element={<div className="p-8"><h2 className="text-2xl font-bold">Projects CRUD coming soon...</h2></div>} />
-            <Route path="experience" element={<div className="p-8"><h2 className="text-2xl font-bold">Experience CRUD coming soon...</h2></div>} />
-            <Route path="education" element={<div className="p-8"><h2 className="text-2xl font-bold">Education CRUD coming soon...</h2></div>} />
-            <Route path="skills" element={<div className="p-8"><h2 className="text-2xl font-bold">Skills CRUD coming soon...</h2></div>} />
           </Route>
 
           {/* Catch-all Route */}
