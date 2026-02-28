@@ -1,9 +1,9 @@
-import { useState } from "react";
-import { Github, Linkedin, Mail, Menu, X } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Github, Linkedin, Mail, Menu, X, Sun, Moon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 
-// Updated links to include the root slash '/' so they work from the /blogs pages too!
+// Navigation Links
 const navLinks = [
   { label: "About", href: "/#about" },
   { label: "Skills", href: "/#skills" },
@@ -13,8 +13,45 @@ const navLinks = [
   { label: "Certifications", href: "/#certifications" },
   { label: "Honors", href: "/#honors" },
   { label: "Contact", href: "/#contact" },
-  { label: "Blogs", href: "/blogs" }, // NEW BLOG LINK
+  { label: "Blogs", href: "/blogs" },
 ];
+
+/**
+ * ThemeToggle Component
+ * Manages the 'dark' class on the document root
+ */
+const ThemeToggle = () => {
+  const [isDark, setIsDark] = useState(false);
+
+  useEffect(() => {
+    // Check local storage or system preference on mount
+    const savedTheme = localStorage.getItem("theme");
+    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    
+    if (savedTheme === "dark" || (!savedTheme && prefersDark)) {
+      document.documentElement.classList.add("dark");
+      setIsDark(true);
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    if (isDark) {
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+      setIsDark(false);
+    } else {
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+      setIsDark(true);
+    }
+  };
+
+  return (
+    <Button variant="ghost" size="icon" onClick={toggleTheme} className="rounded-full">
+      {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+    </Button>
+  );
+};
 
 const Header = ({ profile }: any) => {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -23,7 +60,7 @@ const Header = ({ profile }: any) => {
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
         
-        {/* Brand Logo - Changed to Link so it routes to Home */}
+        {/* Brand Logo */}
         <Link to="/" className="font-mono font-semibold text-primary text-lg hover:opacity-80 transition-opacity">
           &lt;IA /&gt;
         </Link>
@@ -36,7 +73,7 @@ const Header = ({ profile }: any) => {
               to={l.href}
               className={`px-3 py-2 text-sm transition-colors rounded-md hover:bg-muted/50 ${
                 l.href === "/blogs" 
-                  ? "text-primary font-medium" // Highlight the blog link slightly
+                  ? "text-primary font-medium" 
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
@@ -46,6 +83,10 @@ const Header = ({ profile }: any) => {
         </nav>
 
         <div className="hidden md:flex items-center gap-2">
+          {/* Theme Toggle Added Here */}
+          <ThemeToggle />
+          <div className="w-[1px] h-4 bg-border mx-1" /> {/* Small separator */}
+          
           {profile?.github_url && (
             <a href={profile.github_url} target="_blank" rel="noopener noreferrer">
               <Button variant="ghost" size="icon"><Github className="h-4 w-4" /></Button>
@@ -63,10 +104,13 @@ const Header = ({ profile }: any) => {
           )}
         </div>
 
-        {/* Mobile toggle */}
-        <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setMobileOpen(!mobileOpen)}>
-          {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </Button>
+        {/* Mobile items */}
+        <div className="flex md:hidden items-center gap-2">
+          <ThemeToggle />
+          <Button variant="ghost" size="icon" onClick={() => setMobileOpen(!mobileOpen)}>
+            {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </Button>
+        </div>
       </div>
 
       {/* Mobile menu */}
