@@ -28,6 +28,12 @@ type ProfileData = {
   resume_url?: string;
   email?: string;
   avatar_url?: string;
+  // NEW FIELDS BELOW
+  why_hire_me_intro?: string;
+  why_hire_me_cp?: string;
+  why_hire_me_bullets?: string[];
+  why_hire_me_outro?: string;
+  why_hire_me_quote?: string;
 };
 
 type ProjectData = {
