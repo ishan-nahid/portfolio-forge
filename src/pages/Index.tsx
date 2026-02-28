@@ -82,7 +82,7 @@ type OpenSourceData = {
   date: string;
 };
 
-type SkillData = { id: string; name: string; category: string context?: string};
+type SkillData = { id: string; name: string; category: string; context?: string };
 type EducationData = { id: string; degree: string; institution: string; start_date: string; grade?: string; end_date: string; description: string; period?: string };
 type CertificationData = { id: string; title: string; issuer: string; date_earned: string; credential_id: string };
 type HonorData = { id: string; title: string; issuer: string; date_received: string; description: string };
