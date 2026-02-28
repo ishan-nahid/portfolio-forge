@@ -1,12 +1,12 @@
 import { motion } from "framer-motion";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Badge } from "@/components/ui/badge";
+import { CheckCircle2, Server, Database, Code2, LayoutTemplate } from "lucide-react";
 
-const proficiencyColor: Record<string, string> = {
-  expert: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30",
-  advanced: "bg-blue-500/15 text-blue-400 border-blue-500/30",
-  intermediate: "bg-amber-500/15 text-amber-400 border-amber-500/30",
-  beginner: "bg-muted text-muted-foreground border-border",
+const categoryIcons: Record<string, React.ReactNode> = {
+  "1. Backend Engineering": <Server className="h-5 w-5 text-blue-500" />,
+  "2. Databases & Data Layer": <Database className="h-5 w-5 text-emerald-500" />,
+  "3. Deployment & Infrastructure": <Code2 className="h-5 w-5 text-amber-500" />,
+  "4. Frontend (Supporting)": <LayoutTemplate className="h-5 w-5 text-purple-500" />
 };
 
 const Skills = ({ skills, isLoading }: any) => {
@@ -15,16 +15,16 @@ const Skills = ({ skills, isLoading }: any) => {
       <section id="skills" className="section-container">
         <Skeleton className="h-10 w-40 mb-4" />
         <Skeleton className="h-5 w-64 mb-12" />
-        <div className="flex flex-wrap gap-3">
-          {Array.from({ length: 16 }).map((_, i) => (
-            <Skeleton key={i} className="h-8 w-24 rounded-full" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {[1, 2, 3, 4].map((i) => (
+            <Skeleton key={i} className="h-48 w-full rounded-xl" />
           ))}
         </div>
       </section>
     );
   }
 
-  // Group by category
+  // Group by category and sort them alphabetically (which respects our "1.", "2." numbering)
   const grouped: Record<string, typeof skills> = {};
   skills?.forEach((s: any) => {
     const cat = s.category || "Other";
@@ -32,47 +32,50 @@ const Skills = ({ skills, isLoading }: any) => {
     grouped[cat]!.push(s);
   });
 
+  const sortedCategories = Object.keys(grouped).sort();
+
   return (
     <section id="skills" className="section-container">
       <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-        <h2 className="section-title">Technical <span className="gradient-text">Skills</span></h2>
-        <p className="section-subtitle">Technologies & tools I work with</p>
+        <h2 className="section-title">Technical <span className="gradient-text">Expertise</span></h2>
+        <p className="section-subtitle">Production technologies and system architecture</p>
       </motion.div>
 
-      {Object.entries(grouped).map(([category, items], catIdx) => (
-        <div key={category} className="mb-8">
-          <motion.h3
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-12">
+        {sortedCategories.map((category, catIdx) => (
+          <motion.div
+            key={category}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: catIdx * 0.1 }}
-            className="text-sm font-mono text-primary uppercase tracking-widest mb-4"
+            className="bg-card border border-border/50 rounded-xl p-6 md:p-8 shadow-sm hover:shadow-md transition-all"
           >
-            {category}
-          </motion.h3>
-          <div className="flex flex-wrap gap-2">
-            {items?.map((skill: any, i: number) => (
-              <motion.div
-                key={skill.id || skill.name}
-                initial={{ opacity: 0, scale: 0.8 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: catIdx * 0.1 + i * 0.05 }}
-                whileHover={{ scale: 1.08 }}
-              >
-                <Badge
-                  variant="outline"
-                  className={`px-3 py-1.5 text-sm cursor-default transition-all duration-200 ${
-                    proficiencyColor[skill.proficiency ?? "intermediate"] ?? proficiencyColor.intermediate
-                  }`}
-                >
-                  {skill.name}
-                </Badge>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      ))}
+            <div className="flex items-center gap-3 mb-6 pb-4 border-b border-border/50">
+              {categoryIcons[category] || <CheckCircle2 className="h-5 w-5 text-primary" />}
+              <h3 className="text-xl font-bold tracking-tight text-foreground">
+                {category.replace(/^\d+\.\s/, '') /* Removes the "1. " prefix for display */}
+              </h3>
+            </div>
+            
+            <div className="space-y-5">
+              {grouped[category]?.map((skill: any, i: number) => (
+                <div key={skill.id || skill.name} className="flex items-start gap-3">
+                  <div className="mt-1.5 min-w-[6px] h-[6px] rounded-full bg-primary/60" />
+                  <div>
+                    <span className="font-semibold text-foreground">{skill.name}</span>
+                    {skill.context && (
+                      <span className="text-muted-foreground text-sm leading-relaxed block mt-0.5">
+                        {skill.context}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        ))}
+      </div>
 
       {(!skills || skills.length === 0) && (
         <p className="text-muted-foreground text-center py-8">Skills will appear here once added via the admin dashboard.</p>
