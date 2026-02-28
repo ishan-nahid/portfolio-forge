@@ -44,14 +44,28 @@ export default function ManageProjects() {
     }
 
     setSaving(true);
+    
+    // CRITICAL FIX: Strip ID before sending to database
+    const { id, ...payload } = currentProject;
+
     if (editId) {
-      const { error } = await supabase.from("projects").update(currentProject).eq("id", editId);
-      if (error) toast.error(error.message);
-      else toast.success("Project updated!");
+      const { data, error } = await supabase.from("projects").update(payload).eq("id", editId).select();
+      if (error) {
+        toast.error(error.message);
+      } else if (data && data.length === 0) {
+        toast.error("Update blocked! Check Supabase UPDATE policies.");
+      } else {
+        toast.success("Project updated!");
+      }
     } else {
-      const { error } = await supabase.from("projects").insert([currentProject]);
-      if (error) toast.error(error.message);
-      else toast.success("Project added!");
+      const { data, error } = await supabase.from("projects").insert([payload]).select();
+      if (error) {
+        toast.error(error.message);
+      } else if (data && data.length === 0) {
+        toast.error("Insert blocked! Check Supabase INSERT policies.");
+      } else {
+        toast.success("Project added!");
+      }
     }
     
     setSaving(false);
