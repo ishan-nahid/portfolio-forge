@@ -29,11 +29,15 @@ export default function ManageExperience() {
     setSaving(true);
     const { id, ...payload } = currentExp;
     if (editId) {
-      const { error } = await supabase.from("experience").update(payload).eq("id", editId);
-      if (error) toast.error(error.message); else toast.success("Updated!");
+      const { data, error } = await supabase.from("experience").update(payload).eq("id", editId).select();
+      if (error) toast.error(error.message); 
+      else if (data && data.length === 0) toast.error("Update blocked! Check RLS policies.");
+      else toast.success("Updated!");
     } else {
-      const { error } = await supabase.from("experience").insert([payload]);
-      if (error) toast.error(error.message); else toast.success("Added!");
+      const { data, error } = await supabase.from("experience").insert([payload]).select();
+      if (error) toast.error(error.message); 
+      else if (data && data.length === 0) toast.error("Insert blocked! Check RLS policies.");
+      else toast.success("Added!");
     }
     setSaving(false); setIsEditing(false); fetchExperience();
   };
@@ -71,6 +75,20 @@ export default function ManageExperience() {
           <Input placeholder="e.g. Present" value={currentExp.end_date || ""} onChange={e => setCurrentExp({...currentExp, end_date: e.target.value})} />
         </div>
       </div>
+      
+      {/* NEW: Experience Type Dropdown */}
+      <div>
+        <label className="text-sm font-medium mb-1 block">Experience Type</label>
+        <select 
+          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          value={currentExp.type || "work"} 
+          onChange={e => setCurrentExp({...currentExp, type: e.target.value})}
+        >
+          <option value="work">Work Experience</option>
+          <option value="other">Other (Leadership, Volunteer, etc.)</option>
+        </select>
+      </div>
+
       <div>
         <label className="text-sm font-medium mb-1 block">Description</label>
         <textarea className="h-32 w-full rounded-md border border-border bg-background p-3 text-sm" placeholder="Description" value={currentExp.description || ""} onChange={e => setCurrentExp({...currentExp, description: e.target.value})} />
@@ -88,7 +106,13 @@ export default function ManageExperience() {
       <div className="grid gap-4">
         {experience.map(exp => (
           <div key={exp.id} className="flex justify-between rounded-lg border bg-card p-4">
-            <div><h3 className="font-bold">{exp.role} at {exp.company}</h3><p className="text-sm text-muted-foreground">{exp.start_date} — {exp.end_date}</p></div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="font-bold">{exp.role} at {exp.company}</h3>
+                <span className="text-[10px] uppercase tracking-wider bg-secondary px-2 py-0.5 rounded text-muted-foreground">{exp.type || "work"}</span>
+              </div>
+              <p className="text-sm text-muted-foreground">{exp.start_date} — {exp.end_date}</p>
+            </div>
             <div className="flex gap-2">
               <Button variant="ghost" size="icon" onClick={() => openEditor(exp)}><Edit2 className="h-4 w-4"/></Button>
               <Button variant="ghost" size="icon" onClick={() => deleteExperience(exp.id)} className="text-destructive"><Trash2 className="h-4 w-4"/></Button>
