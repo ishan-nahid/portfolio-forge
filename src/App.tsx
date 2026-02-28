@@ -3,11 +3,20 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+
+// Public Pages
 import Index from "./pages/Index";
-import Admin from "./pages/Admin";
 import Blogs from "./pages/Blogs";
 import BlogPost from "./pages/BlogPost";
 import NotFound from "./pages/NotFound";
+
+// Admin Layout & Auth Components
+import Login from "./pages/admin/Login";
+import AdminLayout from "./components/layout/AdminLayout";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
+
+// Admin Modules
+import ManageProfile from "./pages/admin/ManageProfile";
 
 const queryClient = new QueryClient();
 
@@ -18,12 +27,41 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
+          {/* Public Routes */}
           <Route path="/" element={<Index />} />
-          <Route path="/admin" element={<Admin />} />
-          {/* New Blog Routes */}
           <Route path="/blogs" element={<Blogs />} />
           <Route path="/blogs/:slug" element={<BlogPost />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          
+          {/* Admin Login */}
+          <Route path="/admin/login" element={<Login />} />
+
+          {/* Secure Admin Dashboard (Nested Routes) */}
+          <Route 
+            path="/admin" 
+            element={
+              <ProtectedRoute>
+                <AdminLayout />
+              </ProtectedRoute>
+            }
+          >
+            {/* Default Dashboard View (/admin) */}
+            <Route index element={
+              <div className="space-y-2">
+                <h2 className="text-2xl font-bold">Welcome to Dashboard</h2>
+                <p className="text-muted-foreground">Select a module from the sidebar to manage your portfolio.</p>
+              </div>
+            } />
+            
+            {/* Profile Management Module (/admin/profile) */}
+            <Route path="profile" element={<ManageProfile />} />
+            
+            {/* Future Admin Modules will be uncommented here as we build them: */}
+            {/* <Route path="blogs" element={<ManageBlogs />} /> */}
+            {/* <Route path="projects" element={<ManageProjects />} /> */}
+            {/* <Route path="experience" element={<ManageExperience />} /> */}
+          </Route>
+
+          {/* Catch-all Route */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
