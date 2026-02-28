@@ -31,11 +31,18 @@ type ProfileData = {
 };
 
 type ProjectData = {
+  id: string;
   title: string;
+  short_description?: string;
   description: string;
-  github_url: string;
-  live_url: string;
-  image_url: string;
+  challenge?: string;
+  solution?: string;
+  impact?: string;
+  tech_stack_json?: string[]; // We added this to the DB
+  github_url?: string;
+  live_url?: string;
+  image_url?: string;
+  project_type?: 'featured' | 'academic'; // NEW
 };
 
 type ExperienceData = {
@@ -43,8 +50,10 @@ type ExperienceData = {
   role: string;
   start_date: string;
   end_date: string;
+  end_date_text?: string; // We added this to the DB
   description: string;
-  type?: string; // NEW
+  bullets?: string[]; // We added this to the DB
+  type?: string; 
   title?: string;
   period?: string;
 };
