@@ -22,6 +22,7 @@ import ManageProjects from "./pages/admin/ManageProjects";
 import ManageExperience from "./pages/admin/ManageExperience";
 import ManageEducation from "./pages/admin/ManageEducation";
 import ManageSkills from "./pages/admin/ManageSkills";
+import ManageResume from "./pages/admin/ManageResume"; // <-- NEW IMPORT
 
 const queryClient = new QueryClient();
 
@@ -58,6 +59,7 @@ const App = () => (
             <Route path="experience" element={<ManageExperience />} />
             <Route path="education" element={<ManageEducation />} />
             <Route path="skills" element={<ManageSkills />} />
+            <Route path="resume" element={<ManageResume />} /> {/* <-- NEW ROUTE */}
             
           </Route>
 
