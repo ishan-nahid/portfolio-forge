@@ -11,6 +11,7 @@ const sidebarLinks = [
   { name: "Experience", href: "/admin/experience", icon: Briefcase },
   { name: "Education", href: "/admin/education", icon: GraduationCap },
   { name: "Skills", href: "/admin/skills", icon: Award },
+  { name: "Resume", href: "/admin/resume", icon: FileText },
 ];
 
 export default function AdminLayout() {
