@@ -4,6 +4,53 @@
 
 @layer base {
   :root {
+    /* --- NEW LIGHT MODE COLORS --- */
+    --background: 0 0% 100%;
+    --foreground: 222 47% 11%;
+
+    --card: 0 0% 98%;
+    --card-foreground: 222 47% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+
+    --primary: 187 92% 38%; /* Slightly deeper teal for better contrast on white */
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222 47% 11%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 187 92% 95%;
+    --accent-foreground: 187 92% 38%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 187 92% 38%;
+
+    --radius: 0.75rem;
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 222 47% 11%;
+    --sidebar-primary: 187 92% 38%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 210 40% 96.1%;
+    --sidebar-accent-foreground: 222 47% 11%;
+    --sidebar-border: 214.3 31.8% 91.4%;
+    --sidebar-ring: 187 92% 38%;
+
+    --glass: 0 0% 100% / 0.6;
+    --glass-border: 214.3 31.8% 91.4% / 0.3;
+    --glow-primary: 187 92% 38% / 0.05;
+  }
+
+  .dark {
+    /* --- YOUR ORIGINAL DARK THEME --- */
     --background: 222 47% 6%;
     --foreground: 210 40% 96%;
 
@@ -25,14 +72,12 @@
     --accent: 187 60% 20%;
     --accent-foreground: 187 92% 70%;
 
-    --destructive: 0 84% 60%;
+    --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
 
     --border: 222 30% 18%;
     --input: 222 30% 18%;
     --ring: 187 92% 48%;
-
-    --radius: 0.75rem;
 
     --sidebar-background: 222 47% 8%;
     --sidebar-foreground: 210 40% 90%;
@@ -47,36 +92,6 @@
     --glass-border: 222 30% 25% / 0.3;
     --glow-primary: 187 92% 48% / 0.15;
   }
-
-  .dark {
-    --background: 222 47% 6%;
-    --foreground: 210 40% 96%;
-    --card: 222 47% 9%;
-    --card-foreground: 210 40% 96%;
-    --popover: 222 47% 9%;
-    --popover-foreground: 210 40% 96%;
-    --primary: 187 92% 48%;
-    --primary-foreground: 222 47% 6%;
-    --secondary: 222 30% 16%;
-    --secondary-foreground: 210 40% 90%;
-    --muted: 222 30% 14%;
-    --muted-foreground: 215 20% 55%;
-    --accent: 187 60% 20%;
-    --accent-foreground: 187 92% 70%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 222 30% 18%;
-    --input: 222 30% 18%;
-    --ring: 187 92% 48%;
-    --sidebar-background: 222 47% 8%;
-    --sidebar-foreground: 210 40% 90%;
-    --sidebar-primary: 187 92% 48%;
-    --sidebar-primary-foreground: 222 47% 6%;
-    --sidebar-accent: 222 30% 14%;
-    --sidebar-accent-foreground: 210 40% 90%;
-    --sidebar-border: 222 30% 18%;
-    --sidebar-ring: 187 92% 48%;
-  }
 }
 
 @layer base {
@@ -85,7 +100,8 @@
   }
 
   body {
-    @apply bg-background text-foreground font-sans antialiased;
+    /* Added transition so the color swap is smooth */
+    @apply bg-background text-foreground font-sans antialiased transition-colors duration-300;
     font-family: 'Inter', system-ui, sans-serif;
   }
 
@@ -127,6 +143,7 @@
   }
 }
 
+/* Animations... (unchanged) */
 @keyframes float {
   0%, 100% { transform: translateY(0px); }
   50% { transform: translateY(-10px); }
